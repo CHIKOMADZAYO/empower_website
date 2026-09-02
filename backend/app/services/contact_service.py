@@ -43,3 +43,24 @@ class ContactService:
         return database.scalar(
             select(ContactMessage).where(ContactMessage.id == message_id)
         )
+    @staticmethod
+    def get_message_by_email(database: Session, email: str) -> list[ContactMessage]:
+        """Get contact messages by email."""
+        return database.scalars(
+            select(ContactMessage).where(ContactMessage.email == email)
+        ).all() 
+
+
+    
+
+    @staticmethod
+    def delete_message(database: Session, message_id: int) -> None:
+        """Delete contact message by ID."""
+        message = database.scalar(
+            select(ContactMessage).where(ContactMessage.id == message_id)
+        )
+        if message:
+            database.delete(message)
+            database.commit()
+
+            

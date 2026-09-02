@@ -34,3 +34,37 @@ class StoryService:
         database.commit()
         database.refresh(story)
         return story
+
+
+    @staticmethod
+    def update_story(
+        database: Session,
+        story_id: int,
+        story_data: StoryCreate
+    ) -> Story | None:
+        """Update story by ID."""
+        story = database.scalar(
+            select(Story).where(Story.id == story_id)
+        )
+        if not story:
+            return None
+        for key, value in story_data.model_dump().items():
+            setattr(story, key, value)
+        database.commit()
+        database.refresh(story)
+        return story
+
+
+    @staticmethod
+    def delete_story(database: Session, story_id: int) -> None:
+        """Delete story by ID."""
+        story = database.scalar(
+            select(Story).where(Story.id == story_id)
+        )
+        if  not story:
+            return {
+                "message": "Story not found",
+                "status_code": 404
+            }
+        database.delete(story)
+        database.commit()

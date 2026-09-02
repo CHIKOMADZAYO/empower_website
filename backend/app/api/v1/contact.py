@@ -51,3 +51,16 @@ async def get_contact_message(
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Message not found")
     return ContactMessageListResponse.model_validate(message)
+
+
+@router.delete("/{message_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_contact_message(
+    message_id: int,
+    database: Annotated[Session, Depends(get_db)],
+    _: Annotated[User, Depends(require_roles("admin"))],
+):
+    """Delete contact message by ID (admin only)."""
+    ContactService.delete_message(database, message_id) 
+    return {
+        "message": f"Contact message with ID {message_id} has been deleted."
+    }

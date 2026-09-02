@@ -42,3 +42,27 @@ async def create_project(
     """Create new project."""
     new_project = ProjectService.create_project(database, project)
     return ProjectResponse.model_validate(new_project)
+
+@router.put("/{project_id}", response_model=ProjectResponse)
+async def update_project(
+    project_id: int,
+    project: ProjectCreate,
+    database: Annotated[Session, Depends(get_db)],
+) -> ProjectResponse:
+    """Update project by ID."""
+    updated_project = ProjectService.update_project(database, project_id, project)
+    if not updated_project:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Project not found")
+    return ProjectResponse.model_validate(updated_project)
+
+
+@router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_project(
+    project_id: int,
+    database: Annotated[Session, Depends(get_db)],
+) -> None:
+    """Delete project by ID."""
+    ProjectService.delete_project(database, project_id)
+
+

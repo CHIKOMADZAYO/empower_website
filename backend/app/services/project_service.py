@@ -34,3 +34,32 @@ class ProjectService:
         database.commit()
         database.refresh(project)
         return project
+
+    @staticmethod
+    def update_project(
+        database: Session,
+        project_id: int,
+        project_data: ProjectCreate
+    ) -> Project | None:
+        """Update project by ID."""
+        project = database.scalar(
+            select(Project).where(Project.id == project_id)
+        )
+        if not project:
+            return None
+        for key, value in project_data.model_dump().items():
+            setattr(project, key, value)
+        database.commit()
+        database.refresh(project)
+        return project
+
+
+    @staticmethod
+    def delete_project(database: Session, project_id: int) -> None:
+        """Delete project by ID."""
+        project = database.scalar(
+            select(Project).where(Project.id == project_id)
+        )
+        if project:
+            database.delete(project)
+            database.commit()
