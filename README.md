@@ -1,68 +1,94 @@
 # Empower
 
-A full-stack web application for empowering communities through projects and storytelling.
+Empower is a community-focused web platform for showcasing projects, stories, and opportunities. The project combines a FastAPI backend with a lightweight frontend built with Vite and static HTML/CSS/JavaScript.
 
-## Project Structure
+## Project structure
 
-```
+```text
 empower/
-├── backend/          # FastAPI backend service
-├── frontend/         # HTML/CSS frontend
-├── docs/            # Project documentation
-└── .github/         # GitHub workflows (CI/CD)
+├── backend/          # FastAPI API and data layer
+├── frontend/         # Vite frontend app
+├── docs/             # Project documentation
+├── .github/          # GitHub workflows
+├── docker-compose.yml
+├── LICENSE
+├── README.md
+└── PROJECT_STRUCTURE.md
 ```
 
-## Quick Start
+## Tech stack
 
-### Backend Setup
+- Backend: Python, FastAPI, SQLAlchemy
+- Frontend: Vite, HTML, CSS, JavaScript
+- Database: SQLite for local development
+- CI: GitHub Actions
+
+## Prerequisites
+
+- Python 3.10+
+- Node.js 18+
+- npm
+
+## Backend setup
 
 ```bash
 cd backend
 python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate    # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .env.example .env
-python -m pytest  # Run tests
-python app/main.py  # Start server
+python -m pytest
+python app/main.py
 ```
 
-### Frontend Setup
+The app will start from the backend entry point defined in [backend/app/main.py](backend/app/main.py).
+
+## Frontend setup
 
 ```bash
 cd frontend
 npm install
-npm run dev  # Start development server
-npm run build  # Build for production
+npm run dev
 ```
 
-## Requirements
+To build the production bundle:
 
-- **Backend**: Python 3.8+, FastAPI
-- **Frontend**: Node.js 14+, npm
+```bash
+cd frontend
+npm run build
+```
 
-## Documentation
+## Local development
 
-See [docs/](docs/) for detailed documentation:
-- [API Documentation](docs/API.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Setup Guide](docs/SETUP.md)
-- [Deployment](docs/DEPLOYMENT.md)
-
-## Development
-
-### Running Tests
+### Run the backend
 
 ```bash
 cd backend
-pytest  # Run all tests
-pytest tests/test_auth.py  # Run specific test
+python app/main.py
 ```
 
-### Database
+### Run the frontend
 
-- Development database: `backend/data/empower.db`
-- See `backend/scripts/` for database utilities
+```bash
+cd frontend
+npm run dev
+```
+
+## Testing
+
+```bash
+cd backend
+pytest
+```
+
+## Documentation
+
+See the project docs for implementation and deployment details:
+
+- [docs/API.md](docs/API.md)
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [docs/SETUP.md](docs/SETUP.md)
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 
 ## License
 
-See LICENSE file for details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
