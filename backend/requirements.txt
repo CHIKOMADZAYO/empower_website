@@ -27,6 +27,7 @@ pydantic_core==2.46.5
 PyJWT==2.13.0
 pytest==7.4.4
 pytest-asyncio==0.23.8
+pytest-cov>=4.1,<7.0
 python-dotenv==1.2.3
 PyYAML==6.0.3
 SQLAlchemy==2.0.52
