@@ -58,6 +58,23 @@ def test_projects_endpoints(client: TestClient) -> None:
     assert created["name"] == payload["name"]
     assert created["category"] == payload["category"]
 
+    update_response = client.put(
+        f"/api/v1/projects/{created['id']}",
+        json={
+            **payload,
+            "name": "Updated Youth Leadership",
+        },
+    )
+    assert update_response.status_code == 200, update_response.text
+    assert update_response.json()["name"] == "Updated Youth Leadership"
+
+    missing_update = client.put("/api/v1/projects/999999", json=payload)
+    assert missing_update.status_code == 404
+
+    delete_response = client.delete(f"/api/v1/projects/{created['id']}")
+    assert delete_response.status_code == 204
+    assert client.get(f"/api/v1/projects/{created['id']}").status_code == 404
+
 
 def test_stories_endpoints(client: TestClient) -> None:
     """Stories should list, return details, and allow creation."""
@@ -96,6 +113,23 @@ def test_stories_endpoints(client: TestClient) -> None:
     created = create_response.json()
     assert created["title"] == payload["title"]
     assert created["category"] == payload["category"]
+
+    update_response = client.put(
+        f"/api/v1/stories/{created['id']}",
+        json={
+            **payload,
+            "title": "Updated community garden story",
+        },
+    )
+    assert update_response.status_code == 200, update_response.text
+    assert update_response.json()["title"] == "Updated community garden story"
+
+    missing_update = client.put("/api/v1/stories/999999", json=payload)
+    assert missing_update.status_code == 404
+
+    delete_response = client.delete(f"/api/v1/stories/{created['id']}")
+    assert delete_response.status_code == 204
+    assert client.get(f"/api/v1/stories/{created['id']}").status_code == 404
 
 
 def test_contact_endpoints(client: TestClient) -> None:
@@ -137,6 +171,27 @@ def test_contact_endpoints(client: TestClient) -> None:
     )
     assert detail_response.status_code == 200, detail_response.text
     assert detail_response.json()["email"] == first_message["email"]
+
+    missing_detail = client.get("/api/v1/contact/999999", headers=headers)
+    assert missing_detail.status_code == 404
+
+    with SessionLocal() as db:
+        viewer = User(
+            username="contact_viewer",
+            email="contact_viewer@example.com",
+            hashed_password=hash_password("StrongPass123"),
+            role="viewer",
+        )
+        db.add(viewer)
+        db.commit()
+        db.refresh(viewer)
+        viewer_token = create_access_token(viewer)
+
+    forbidden_detail = client.get(
+        f"/api/v1/contact/{first_message['id']}",
+        headers={"Authorization": f"Bearer {viewer_token}"},
+    )
+    assert forbidden_detail.status_code == 403
 
 
 def test_protected_endpoints_reject_unauthorized_and_forbidden_access(client: TestClient) -> None:

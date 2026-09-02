@@ -14,7 +14,10 @@ class Settings:
     )
 
     # Security Settings
-    SECRET_KEY: str = os.getenv("EMPOWER_SECRET_KEY", "development-only-change-me")
+    SECRET_KEY: str = os.getenv(
+        "EMPOWER_SECRET_KEY",
+        "development-only-change-me-32-bytes-minimum",
+    )
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
