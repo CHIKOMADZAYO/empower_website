@@ -38,4 +38,4 @@ typing_extensions==4.16.0
 uvicorn==0.52.4
 uvloop==0.22.1
 watchfiles==1.2.0
-websockets>=10.4,<11
+websockets>=13,<16
