@@ -1,5 +1,5 @@
 """User schemas - request/response models."""
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserBase(BaseModel):
@@ -10,7 +10,6 @@ class UserBase(BaseModel):
 
 class UserResponse(UserBase):
     """User response schema."""
-    id: int
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        from_attributes = True
+    id: int

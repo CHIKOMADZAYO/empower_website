@@ -14,6 +14,20 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
+    sourcemap: true,
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        index: 'src/pages/index.html',
+        about: 'src/pages/about.html',
+        contact: 'src/pages/contact.html',
+        donate: 'src/pages/donate.html',
+        login: 'src/pages/login.html',
+        projects: 'src/pages/projects.html',
+        signup: 'src/pages/signup.html',
+        stories: 'src/pages/stories.html',
+        support: 'src/pages/support.html'
+      }
+    }
   }
 })

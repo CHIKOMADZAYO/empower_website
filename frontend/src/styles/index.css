@@ -1,5 +1,7 @@
-# Empower Frontend - Styles Index
-/* Import all CSS modules */
+/*
+ * Empower Frontend - Styles Index
+ * Import all CSS modules
+ */
 @import './components.css';
 @import './responsive.css';
 @import './variables.css';

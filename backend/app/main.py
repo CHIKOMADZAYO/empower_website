@@ -13,75 +13,65 @@ settings = get_settings()
 
 
 def seed_database() -> None:
-    """Seed database with initial data."""
+    """Seed database with local demo data when the database is empty."""
     from sqlalchemy.orm import Session
     from sqlalchemy import select
 
     from app.core.database import SessionLocal
+    from app.core.security import hash_password
+    from app.models.contact import ContactMessage
     from app.models.project import Project
     from app.models.story import Story
     from app.models.user import User
-    from app.core.security import hash_password
+    from data.moct_data import (
+        MOCK_CONTACT_MESSAGES,
+        MOCK_PROJECTS,
+        MOCK_STORIES,
+        MOCK_USERS,
+    )
 
     with Session(SessionLocal.kw["bind"]) as db:
         if db.scalar(select(User.id).limit(1)) is None:
             db.add_all([
                 User(
-                    username="alice",
-                    email="alice@empower.org",
-                    hashed_password=hash_password("admin-pass-123"),
-                    role="admin"
-                ),
-                User(
-                    username="william",
-                    email="william@empower.org",
-                    hashed_password=hash_password("editor-pass-123"),
-                    role="editor"
-                ),
-                User(
-                    username="Ben",
-                    email="ben@empower.org",
-                    hashed_password=hash_password("viewer-pass-123"),
-                    role="viewer"
-                ),
+                    username=user["username"],
+                    email=user["email"],
+                    hashed_password=hash_password(user["password"]),
+                    role=user["role"],
+                )
+                for user in MOCK_USERS
             ])
 
         if db.scalar(select(Project.id).limit(1)) is None:
             db.add_all([
                 Project(
-                    name="Learning",
-                    category="Education",
-                    summary="Open doors to opportunity.",
-                    description="We support mentors, teachers, and young people with learning spaces, practical skills, and pathways into work.",
-                ),
-                Project(
-                    name="Wellbeing",
-                    category="Health",
-                    summary="Care that meets people where they are.",
-                    description="Local health champions connect families to trusted information, care, and one another.",
-                ),
-                Project(
-                    name="Opportunity",
-                    category="Livelihoods",
-                    summary="Ideas with room to grow.",
-                    description="We help community enterprises build resilient livelihoods through training, networks, and patient support.",
-                ),
+                    name=project["name"],
+                    category=project["category"],
+                    summary=project["summary"],
+                    description=project["description"],
+                )
+                for project in MOCK_PROJECTS
             ])
 
         if db.scalar(select(Story.id).limit(1)) is None:
             db.add_all([
                 Story(
-                    title="The library became our meeting place.",
-                    category="Learning",
-                    excerpt="A community reading room became a place for young people to study, meet, and see new possibilities.",
-                    year=2025,
-                ),
-                Story(
-                    title="We are growing something that is ours.",
-                    category="Opportunity",
-                    excerpt="A cooperative of local makers is building reliable incomes while keeping traditional knowledge alive.",
-                    year=2024,
-                ),
+                    title=story["title"],
+                    category=story["category"],
+                    excerpt=story["excerpt"],
+                    year=story["year"],
+                )
+                for story in MOCK_STORIES
+            ])
+
+        if db.scalar(select(ContactMessage.id).limit(1)) is None:
+            db.add_all([
+                ContactMessage(
+                    name=message["name"],
+                    email=message["email"],
+                    message=message["message"],
+                )
+                for message in MOCK_CONTACT_MESSAGES
             ])
 
         db.commit()

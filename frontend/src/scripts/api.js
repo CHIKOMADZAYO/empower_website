@@ -3,40 +3,41 @@
  * Handles all API communication with the backend
  */
 
-const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
 
 /**
- * Generic API request handler
+ * Generic API request handler.
+ * Ensures payloads match the FastAPI backend contracts.
  */
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
   const headers = {
     'Content-Type': 'application/json',
-    ...options.headers
+    ...(options.headers || {})
   };
 
-  // Add auth token if available
   const token = localStorage.getItem('token');
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    headers.Authorization = `Bearer ${token}`;
   }
 
   try {
     const response = await fetch(url, {
       ...options,
-      headers
+      headers,
     });
 
     if (response.status === 401) {
-      // Handle unauthorized - clear token and redirect to login
       localStorage.removeItem('token');
       window.location.href = '/login.html';
+      return null;
     }
 
-    const data = await response.json();
+    const contentType = response.headers.get('content-type') || '';
+    const data = contentType.includes('application/json') ? await response.json() : await response.text();
 
     if (!response.ok) {
-      throw new Error(data.detail || 'API Error');
+      throw new Error(typeof data === 'object' && data && 'detail' in data ? data.detail : 'API Error');
     }
 
     return data;
@@ -47,17 +48,17 @@ async function apiRequest(endpoint, options = {}) {
 }
 
 // Auth Endpoints
-export async function login(email, password) {
+export async function login(username, password) {
   return apiRequest('/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ username, password })
   });
 }
 
-export async function signup(email, password, fullName) {
+export async function signup(username, email, password) {
   return apiRequest('/auth/signup', {
     method: 'POST',
-    body: JSON.stringify({ email, password, full_name: fullName })
+    body: JSON.stringify({ username, email, password })
   });
 }
 
@@ -75,10 +76,10 @@ export async function getProject(id) {
   return apiRequest(`/projects/${id}`);
 }
 
-export async function createProject(title, description) {
+export async function createProject(name, category, summary, description) {
   return apiRequest('/projects', {
     method: 'POST',
-    body: JSON.stringify({ title, description })
+    body: JSON.stringify({ name, category, summary, description })
   });
 }
 
@@ -91,10 +92,10 @@ export async function getStory(id) {
   return apiRequest(`/stories/${id}`);
 }
 
-export async function createStory(title, content, projectId) {
+export async function createStory(title, category, excerpt, year) {
   return apiRequest('/stories', {
     method: 'POST',
-    body: JSON.stringify({ title, content, project_id: projectId })
+    body: JSON.stringify({ title, category, excerpt, year })
   });
 }
 

@@ -1,5 +1,5 @@
 """Contact message domain model."""
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -16,9 +16,9 @@ class ContactMessage(Base):
     email: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     message: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=lambda: datetime.utcnow(),
-        nullable=False
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        nullable=False,
     )
 
     def __repr__(self) -> str:
