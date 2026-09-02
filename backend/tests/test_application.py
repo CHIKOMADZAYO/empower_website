@@ -13,9 +13,9 @@ def test_application_lifespan_initializes_and_seeds_database() -> None:
         stories = application.get("/api/v1/stories")
 
     assert projects.status_code == 200
-    assert len(projects.json()) == 3
+    assert len(projects.json()) == 6
     assert stories.status_code == 200
-    assert len(stories.json()) == 3
+    assert len(stories.json()) == 6
 
 
 def test_database_dependency_yields_and_closes_session() -> None:

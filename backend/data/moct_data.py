@@ -49,6 +49,33 @@ MOCK_PROJECTS = [
             "networks, and patient support."
         ),
     },
+    {
+        "name": "Digital Access",
+        "category": "Technology",
+        "summary": "Put useful tools within reach.",
+        "description": (
+            "Community hubs provide affordable internet, digital skills training, and "
+            "practical support for accessing essential services."
+        ),
+    },
+    {
+        "name": "Climate Resilience",
+        "category": "Environment",
+        "summary": "Prepare communities for a changing climate.",
+        "description": (
+            "Local groups are restoring shared green spaces, improving water security, "
+            "and testing climate-smart ways to protect household incomes."
+        ),
+    },
+    {
+        "name": "Mothers' Network",
+        "category": "Family Support",
+        "summary": "Stronger support for parents and children.",
+        "description": (
+            "Parent-led circles connect families with childcare knowledge, peer support, "
+            "and trusted referrals when extra help is needed."
+        ),
+    },
 ]
 
 MOCK_STORIES = [
@@ -79,6 +106,33 @@ MOCK_STORIES = [
         ),
         "year": 2023,
     },
+    {
+        "title": "A phone opened a new door.",
+        "category": "Technology",
+        "excerpt": (
+            "Digital mentors helped local traders use online tools to find customers, "
+            "manage stock, and keep more of what they earn."
+        ),
+        "year": 2025,
+    },
+    {
+        "title": "The riverbank belongs to everyone.",
+        "category": "Environment",
+        "excerpt": (
+            "Neighbours worked together to restore a shared riverbank and create safer "
+            "water access for homes and small farms."
+        ),
+        "year": 2022,
+    },
+    {
+        "title": "Parents found strength in one another.",
+        "category": "Family Support",
+        "excerpt": (
+            "A parent-led network turned weekly conversations into practical childcare "
+            "support and a more connected neighbourhood."
+        ),
+        "year": 2021,
+    },
 ]
 
 MOCK_CONTACT_MESSAGES = [
@@ -96,6 +150,22 @@ MOCK_CONTACT_MESSAGES = [
         "message": (
             "Can you tell us more about how we can volunteer for the wellbeing and youth "
             "support programmes?"
+        ),
+    },
+    {
+        "name": "Grace Wanjiku",
+        "email": "grace@example.com",
+        "message": (
+            "Our youth group would like to learn more about the digital access hubs and "
+            "how to volunteer as mentors."
+        ),
+    },
+    {
+        "name": "Samuel Otieno",
+        "email": "samuel@example.com",
+        "message": (
+            "We are interested in partnering on a community project focused on water "
+            "security and climate resilience."
         ),
     },
 ]

@@ -4,6 +4,8 @@
 import sys
 from pathlib import Path
 
+from sqlalchemy import select
+
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -22,56 +24,29 @@ def seed_database() -> None:
     Base.metadata.create_all(bind=engine)
 
     with SessionLocal() as db:
-        if db.query(User).first() is None:
-            db.add_all(
-                [
-                    User(
-                        username=item["username"],
-                        email=item["email"],
-                        hashed_password=hash_password(item["password"]),
-                        role=item["role"],
-                    )
-                    for item in MOCK_USERS
-                ]
-            )
+        for item in MOCK_USERS:
+            if db.scalar(select(User.id).where(User.username == item["username"])) is None:
+                db.add(User(
+                    username=item["username"],
+                    email=item["email"],
+                    hashed_password=hash_password(item["password"]),
+                    role=item["role"],
+                ))
 
-        if db.query(Project).first() is None:
-            db.add_all(
-                [
-                    Project(
-                        name=item["name"],
-                        category=item["category"],
-                        summary=item["summary"],
-                        description=item["description"],
-                    )
-                    for item in MOCK_PROJECTS
-                ]
-            )
+        for item in MOCK_PROJECTS:
+            if db.scalar(select(Project.id).where(Project.name == item["name"])) is None:
+                db.add(Project(**item))
 
-        if db.query(Story).first() is None:
-            db.add_all(
-                [
-                    Story(
-                        title=item["title"],
-                        category=item["category"],
-                        excerpt=item["excerpt"],
-                        year=item["year"],
-                    )
-                    for item in MOCK_STORIES
-                ]
-            )
+        for item in MOCK_STORIES:
+            if db.scalar(select(Story.id).where(Story.title == item["title"])) is None:
+                db.add(Story(**item))
 
-        if db.query(ContactMessage).first() is None:
-            db.add_all(
-                [
-                    ContactMessage(
-                        name=item["name"],
-                        email=item["email"],
-                        message=item["message"],
-                    )
-                    for item in MOCK_CONTACT_MESSAGES
-                ]
-            )
+        for item in MOCK_CONTACT_MESSAGES:
+            if db.scalar(select(ContactMessage.id).where(
+                ContactMessage.email == item["email"],
+                ContactMessage.message == item["message"],
+            )) is None:
+                db.add(ContactMessage(**item))
 
         db.commit()
 

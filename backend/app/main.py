@@ -13,68 +13,10 @@ settings = get_settings()
 
 
 def seed_database() -> None:
-    """Seed database with local demo data when the database is empty."""
-    from sqlalchemy.orm import Session
-    from sqlalchemy import select
+    """Seed database with local demo data."""
+    from scripts.seed_db import seed_database as seed_data
 
-    from app.core.database import SessionLocal
-    from app.core.security import hash_password
-    from app.models.contact import ContactMessage
-    from app.models.project import Project
-    from app.models.story import Story
-    from app.models.user import User
-    from data.moct_data import (
-        MOCK_CONTACT_MESSAGES,
-        MOCK_PROJECTS,
-        MOCK_STORIES,
-        MOCK_USERS,
-    )
-
-    with Session(SessionLocal.kw["bind"]) as db:
-        if db.scalar(select(User.id).limit(1)) is None:
-            db.add_all([
-                User(
-                    username=user["username"],
-                    email=user["email"],
-                    hashed_password=hash_password(user["password"]),
-                    role=user["role"],
-                )
-                for user in MOCK_USERS
-            ])
-
-        if db.scalar(select(Project.id).limit(1)) is None:
-            db.add_all([
-                Project(
-                    name=project["name"],
-                    category=project["category"],
-                    summary=project["summary"],
-                    description=project["description"],
-                )
-                for project in MOCK_PROJECTS
-            ])
-
-        if db.scalar(select(Story.id).limit(1)) is None:
-            db.add_all([
-                Story(
-                    title=story["title"],
-                    category=story["category"],
-                    excerpt=story["excerpt"],
-                    year=story["year"],
-                )
-                for story in MOCK_STORIES
-            ])
-
-        if db.scalar(select(ContactMessage.id).limit(1)) is None:
-            db.add_all([
-                ContactMessage(
-                    name=message["name"],
-                    email=message["email"],
-                    message=message["message"],
-                )
-                for message in MOCK_CONTACT_MESSAGES
-            ])
-
-        db.commit()
+    seed_data()
 
 
 @asynccontextmanager
