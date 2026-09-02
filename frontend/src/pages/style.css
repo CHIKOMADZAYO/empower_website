@@ -1,0 +1,10 @@
+/**
+ * Empower Frontend - Consolidated Stylesheet
+ * Imports all CSS modules
+ */
+
+@import '../styles/variables.css';
+@import '../styles/index.css';
+@import '../styles/main.css';
+@import '../styles/components.css';
+@import '../styles/responsive.css';
