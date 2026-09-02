@@ -59,3 +59,5 @@ async def get_profile(
         "message": f"Authenticated as {current_user.username}",
         "user": public_user(current_user),
     }
+
+
