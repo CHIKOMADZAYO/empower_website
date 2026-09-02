@@ -1461,3 +1461,154 @@ h2 {
         font-size: 0.76rem;
     }
 }
+
+/* Tangible Impact Section */
+.impact-gifts {
+    padding-top: 2rem;
+    padding-bottom: 5rem;
+}
+
+.gifts-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.gift-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 220px;
+    padding: 2rem 1.5rem;
+    border-top: 4px solid #1d6b4b;
+    background-color: #fffdf8;
+    transition: box-shadow 180ms ease, transform 180ms ease;
+}
+
+.gift-card:nth-child(2) {
+    border-top-color: #e47b39;
+}
+
+.gift-card:nth-child(3) {
+    border-top-color: #8ca85e;
+}
+
+.gift-card:nth-child(4) {
+    border-top-color: #b89f5a;
+}
+
+.gift-card:hover {
+    box-shadow: 8px 8px 0 #dcebd7;
+    transform: translateY(-5px);
+}
+
+.gift-amount {
+    display: block;
+    margin-bottom: 1rem;
+    color: #1d6b4b;
+    font-family: 'Source Sans 3', Arial, sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+}
+
+.gift-card h3 {
+    margin: 0.5rem 0 0.75rem;
+    font-size: 1.4rem;
+}
+
+.gift-card p {
+    color: #52665a;
+    line-height: 1.65;
+}
+
+/* Enhanced Button Sizing */
+.button-large {
+    padding: 1.25rem 2rem;
+    font-size: 1rem;
+}
+
+/* Enhanced Trust Section */
+.trust-section {
+    margin-top: 3rem;
+    padding-top: 3rem;
+    border-top: 1px solid #dce5d8;
+}
+
+.trust-section .eyebrow {
+    display: block;
+    margin-bottom: 1.5rem;
+}
+
+.trust-badges {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.badge {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border: 1px solid #dce5d8;
+    border-radius: 6px;
+    background-color: #f5f7f2;
+    color: #3e5c45;
+    font-family: 'Source Sans 3', Arial, sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+.badge-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #1d6b4b;
+    color: #fffdf8;
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.trust-stat {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #1d6b4b;
+    font-family: 'Source Sans 3', Arial, sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+}
+
+.trust-card span.trust-stat {
+    margin-bottom: 1rem;
+}
+
+/* Responsive Grid Adjustments */
+@media (max-width: 1024px) {
+    .gifts-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .trust-badges {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .gifts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .button-large {
+        width: 100%;
+        justify-content: center;
+    }
+}
