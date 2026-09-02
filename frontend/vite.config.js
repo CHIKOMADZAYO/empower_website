@@ -1,6 +1,23 @@
 import { defineConfig } from 'vite'
 
+const pageNames = ['about', 'contact', 'donate', 'login', 'projects', 'signup', 'stories', 'support']
+
 export default defineConfig({
+  plugins: [{
+    name: 'clean-page-routes',
+    configureServer(server) {
+      server.middlewares.use((request, response, next) => {
+        const pathname = request.url.split('?')[0]
+        const pageName = pathname === '/' ? 'index' : pathname.slice(1).replace(/\.html$/, '')
+
+        if (pageName === 'index' || pageNames.includes(pageName)) {
+          request.url = `/src/pages/${pageName}.html`
+        }
+
+        next()
+      })
+    }
+  }],
   server: {
     port: 3000,
     open: true,

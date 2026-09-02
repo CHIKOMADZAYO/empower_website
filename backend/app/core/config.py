@@ -10,21 +10,21 @@ class Settings:
     # Database
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
-        f"sqlite:///{Path(__file__).resolve().parent.parent / 'empower.db'}"
+        f"sqlite:///{Path(__file__).resolve().parents[2] / 'empower.db'}"
     )
 
-    # Security
+    # Security Settings
     SECRET_KEY: str = os.getenv("EMPOWER_SECRET_KEY", "development-only-change-me")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
-    # App
+    # App Settings
     APP_NAME: str = "Empower API"
     APP_VERSION: str = "1.0.0"
     APP_DESCRIPTION: str = "API for Empower's community-led programs and support network."
     DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
 
-    # CORS
+    # CORS Settings
     CORS_ORIGINS: list[str] = ["*"]
     CORS_ALLOW_CREDENTIALS: bool = False
     CORS_ALLOW_METHODS: list[str] = ["*"]
