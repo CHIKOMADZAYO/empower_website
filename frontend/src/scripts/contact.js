@@ -4,14 +4,18 @@ const contactForm = document.querySelector('[data-contact-form]');
 const contactStatus = document.querySelector('[data-contact-status]');
 
 function setStatus(message, isError = false) {
-  contactStatus.textContent = message;
-  contactStatus.style.color = isError ? '#b42318' : '#0f766e';
+  const status = document.querySelector('[data-contact-status]');
+  if (!status) return;
+
+  status.textContent = message;
+  status.style.color = isError ? '#b42318' : '#0f766e';
 }
 
-async function handleContactSubmit(event) {
+export async function handleContactSubmit(event) {
   event.preventDefault();
 
-  const formData = new FormData(contactForm);
+  const form = event.currentTarget;
+  const formData = new FormData(form);
   const name = formData.get('name')?.trim();
   const email = formData.get('email')?.trim();
   const message = formData.get('message')?.trim();
@@ -24,7 +28,7 @@ async function handleContactSubmit(event) {
   try {
     setStatus('Sending your message...');
     await submitContact(name, email, message);
-    contactForm.reset();
+    form.reset();
     setStatus('Thanks. Your message has been sent.');
   } catch (error) {
     setStatus(error.message || 'Unable to send your message. Please try again.', true);

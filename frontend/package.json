@@ -1,18 +1,27 @@
 {
   "name": "empower-frontend",
   "version": "1.0.0",
+  "type": "module",
   "description": "Frontend for Empower community project",
   "main": "src/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "test": "vitest run",
     "preview": "vite preview",
     "serve": "vite preview --port 5000"
   },
-  "keywords": ["empower", "community", "projects", "stories"],
+  "keywords": [
+    "empower",
+    "community",
+    "projects",
+    "stories"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "vite": "^4.4.0"
+    "jsdom": "^30.0.1",
+    "vite": "^4.4.0",
+    "vitest": "^4.1.11"
   }
 }

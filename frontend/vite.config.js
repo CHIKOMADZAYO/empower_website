@@ -46,5 +46,8 @@ export default defineConfig({
         support: 'src/pages/support.html'
       }
     }
+  },
+  test: {
+    environment: 'jsdom',
   }
 })
