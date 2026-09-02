@@ -1,0 +1,28 @@
+/* Responsive Design */
+
+/* Tablets */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+  
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 10px;
+  }
+  
+  .btn {
+    width: 100%;
+    display: block;
+  }
+  
+  .card {
+    padding: var(--spacing-md);
+  }
+}

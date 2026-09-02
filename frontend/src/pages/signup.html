@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create your Empower account to join the community workspace.">
+    <link rel="stylesheet" href="style.css">
+    <title>Sign up | Empower</title>
+</head>
+<body>
+    <header>
+        <nav class="navbar" aria-label="Main navigation">
+            <a class="brand" href="index.html" aria-label="Empower home"><span class="brand-mark" aria-hidden="true">+</span><span>Empower</span></a>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="support.html">Support</a></li>
+                <li><a href="stories.html">Stories</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="login.html">Sign in</a></li>
+                <li><a class="nav-donate" href="donate.html">Donate</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="login-page">
+            <div class="login-intro">
+                <p class="eyebrow">Join Empower</p>
+                <h1>Start building with your community.</h1>
+                <p>Create your account to track projects, collaborate with local partners, and stay connected to the people behind the work.</p>
+            </div>
+            <form class="login-form" data-signup-form>
+                <div class="login-form-heading">
+                    <h2>Create account</h2>
+                    <p>Set up your Empower profile.</p>
+                </div>
+                <label for="signup-username">Username</label>
+                <input id="signup-username" name="username" type="text" autocomplete="username" required minlength="2">
+                <label for="signup-email">Email</label>
+                <input id="signup-email" name="email" type="email" autocomplete="email" required>
+                <label for="signup-password">Password</label>
+                <input id="signup-password" name="password" type="password" autocomplete="new-password" required minlength="8">
+                <label for="signup-confirm-password">Confirm password</label>
+                <input id="signup-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" required minlength="8">
+                <button class="button button-primary" type="submit">Create account <span aria-hidden="true">&#8594;</span></button>
+                <p class="form-status" data-signup-status role="status" aria-live="polite"></p>
+                <p class="auth-switch">Already have an account? <a href="login.html">Sign in</a></p>
+            </form>
+        </section>
+    </main>
+    <footer class="footer"><div class="section-shell footer-inner"><div class="footer-about"><a class="brand footer-brand" href="index.html"><span class="brand-mark" aria-hidden="true">+</span><span>Empower</span></a><p>People-powered progress, since 2014.</p></div><div class="footer-column"><h2>Explore</h2><a href="about.html">About us</a><a href="projects.html">Our projects</a><a href="stories.html">Community stories</a></div><div class="footer-column"><h2>Connect</h2><a href="mailto:hello@empower.org">hello@empower.org</a><a href="tel:+254700000000">+254 700 000 000</a><span>Nairobi, Kenya</span></div><div class="footer-column footer-action"><h2>Stay in touch</h2><p>Get occasional updates from the communities we work with.</p><a class="footer-link" href="contact.html">Join our updates <span aria-hidden="true">&#8594;</span></a></div></div><div class="footer-bottom"><div class="section-shell footer-bottom-inner"><span>&copy; 2026 Empower</span><div><a href="contact.html#privacy">Privacy</a><a href="contact.html#accessibility">Accessibility</a></div></div></div></footer>
+    <script src="api.js" defer></script>
+</body>
+</html>

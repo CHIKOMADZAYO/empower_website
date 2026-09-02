@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./data/empower.db
+      - SECRET_KEY=your-secret-key-change-in-production
+      - DEBUG=true
+    volumes:
+      - ./backend:/app
+      - ./backend/data:/app/data
+    command: python app/main.py
+    depends_on:
+      - postgres
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - VITE_API_URL=http://localhost:8000/api/v1
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=empower
+      - POSTGRES_USER=empower
+      - POSTGRES_PASSWORD=empower_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
