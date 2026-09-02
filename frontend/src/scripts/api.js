@@ -1,7 +1,4 @@
-/**
- * Empower Frontend - API Module
- * Handles all API communication with the backend
- */
+// Mobile Application Programming Interface (API) for Empower Frontend
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
