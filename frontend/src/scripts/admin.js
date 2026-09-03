@@ -15,6 +15,7 @@ const dashboard = document.querySelector('[data-admin-dashboard]');
 const status = document.querySelector('[data-admin-status]');
 
 function setStatus(message, isError = false) {
+  if (!status) return;
   status.textContent = message;
   status.dataset.state = isError ? 'error' : 'success';
 }
@@ -114,6 +115,8 @@ document.querySelector('[data-logout]')?.addEventListener('click', () => {
 });
 
 async function initialize() {
+  if (!dashboard) return;
+
   const token = getToken();
   const claims = token ? decodeToken(token) : null;
   if (!claims || claims.role !== 'admin') {
@@ -123,7 +126,10 @@ async function initialize() {
 
   try {
     const profile = await getProfile();
-    document.querySelector('[data-admin-user]').textContent = profile?.user?.username || claims.username || 'Administrator';
+    const userLabel = document.querySelector('[data-admin-user]');
+    if (userLabel) {
+      userLabel.textContent = profile?.user?.username || claims.username || 'Administrator';
+    }
     await loadDashboard();
   } catch (error) {
     setStatus(error.message || 'Unable to verify administrator access.', true);
