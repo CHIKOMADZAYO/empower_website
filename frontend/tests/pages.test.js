@@ -59,6 +59,24 @@ describe('data pages', () => {
     expect(document.querySelector('[data-stories]').textContent).toContain('2025');
   });
 
+  it('expands and collapses story details', async () => {
+    await loadPage('[data-stories]', '../src/scripts/stories.js', storyData);
+
+    const toggle = document.querySelector('.story-toggle');
+    const details = document.querySelector('.story-details');
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(details.hidden).toBe(true);
+
+    toggle.click();
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(toggle.textContent).toContain('Show less');
+    expect(details.hidden).toBe(false);
+
+    toggle.click();
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(details.hidden).toBe(true);
+  });
+
   it('shows a useful error when a collection cannot load', async () => {
     document.body.innerHTML = '<div data-projects></div>';
     globalThis.fetch = vi.fn().mockRejectedValue(new Error('offline'));

@@ -5,8 +5,6 @@ from pathlib import Path
 
 
 
-   
-
 class Settings:
     """Application settings from environment variables."""
 
