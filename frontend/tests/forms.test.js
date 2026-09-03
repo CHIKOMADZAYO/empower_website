@@ -1,5 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { handleContactSubmit } from '../src/scripts/contact.js';
+
+afterEach(() => {
+  document.body.innerHTML = '';
+  vi.restoreAllMocks();
+});
 
 describe('contact form', () => {
   it('validates required fields before making a request', async () => {
@@ -44,5 +49,23 @@ describe('contact form', () => {
     expect(fetch).toHaveBeenCalledWith('/api/contact', expect.objectContaining({ method: 'POST' }));
     expect(document.querySelector('[data-contact-form]').querySelector('[name="name"]').value).toBe('');
     expect(document.querySelector('[data-contact-status]').textContent).toBe('Thanks. Your message has been sent.');
+  });
+
+  it('blocks messages shorter than the API minimum', async () => {
+    document.body.innerHTML = `
+      <form data-contact-form>
+        <input name="name" value="Amina Yusuf" />
+        <input name="email" value="amina@example.com" />
+        <textarea name="message">Too short</textarea>
+      </form>
+      <p data-contact-status></p>
+    `;
+    globalThis.fetch = vi.fn();
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+
+    await handleContactSubmit({ preventDefault: vi.fn(), currentTarget: document.querySelector('form') });
+
+    expect(document.querySelector('[data-contact-status]').textContent).toContain('between 10 and 2000');
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 });

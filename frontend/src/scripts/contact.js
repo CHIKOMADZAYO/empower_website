@@ -25,6 +25,21 @@ export async function handleContactSubmit(event) {
     return;
   }
 
+  if (name.length < 2 || name.length > 100) {
+    setStatus('Please enter a name between 2 and 100 characters.', true);
+    return;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setStatus('Please enter a valid email address.', true);
+    return;
+  }
+
+  if (message.length < 10 || message.length > 2000) {
+    setStatus('Please enter a message between 10 and 2000 characters.', true);
+    return;
+  }
+
   try {
     setStatus('Sending your message...');
     await submitContact(name, email, message);
