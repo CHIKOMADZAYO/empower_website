@@ -86,7 +86,7 @@ class AuthService:
                 return
             except Exception:
                 if attempt == attempts - 1:
-                    logger.exception("Unable to send welcome email to %s", user.email)
+                    logger.exception("Welcome email delivery failed after all retry attempts")
                     return
                 delay = settings.MAIL_RETRY_DELAY_SECONDS * (2**attempt)
                 await asyncio.sleep(max(0, delay))
