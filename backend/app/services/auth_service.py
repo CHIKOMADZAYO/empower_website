@@ -1,10 +1,18 @@
 """Authentication service - business logic for auth operations."""
+import asyncio
+import logging
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.config import get_settings
+from app.core.mail import Mail
 from app.core.security import hash_password, verify_password, create_access_token
 from app.models.user import User
 from app.schemas.auth import SignupRequest, TokenResponse
+
+
+logger = logging.getLogger(__name__)
 
 
 class AuthService:
@@ -47,11 +55,64 @@ class AuthService:
             hashed_password=hash_password(signup_request.password),
             role="viewer",
         )
+
         database.add(user)
         database.commit()
         database.refresh(user)
         return user
 
+    @staticmethod
+    async def send_welcome_email(user: User) -> None:
+        """Send a welcome email when SMTP delivery is configured."""
+        settings = get_settings()
+        if not settings.MAIL_ENABLED or not all(
+            (settings.MAIL_USERNAME, settings.MAIL_PASSWORD, settings.MAIL_FROM, settings.MAIL_SERVER)
+        ):
+            return
+
+        mail = Mail(settings)
+        attempts = max(1, settings.MAIL_RETRY_ATTEMPTS)
+        for attempt in range(attempts):
+            try:
+                await mail.send_email(
+                    subject="Welcome to Empower!",
+                    recipients=[user.email],
+                    body=(
+                        f"Hello {user.username},\n\n"
+                        "Thank you for signing up for Empower! We're excited to have you on board.\n\n"
+                        "Best regards,\nThe Empower Team"
+                    ),
+                )
+                return
+            except Exception:
+                if attempt == attempts - 1:
+                    logger.exception("Unable to send welcome email to %s", user.email)
+                    return
+                delay = settings.MAIL_RETRY_DELAY_SECONDS * (2**attempt)
+                await asyncio.sleep(max(0, delay))
+
+
+    @staticmethod
+    def get_user_by_username(database: Session, username: str) -> User | None:
+        """Retrieve user by username."""
+        return database.scalar(
+            select(User).where(User.username == username)
+        )
+
+    @staticmethod
+    def get_user_by_email(database: Session, email: str) -> User | None:
+        """Retrieve user by email."""
+        return database.scalar(
+            select(User).where(User.email == email)
+        )
+
+    @staticmethod
+    def get_user_by_id(database: Session, user_id: int) -> User | None:
+        """Retrieve user by ID."""
+        return database.scalar(
+            select(User).where(User.id == user_id)
+        )
+    
     @staticmethod
     def get_token_response(user: User) -> TokenResponse:
         """Generate token response for user."""

@@ -1,5 +1,9 @@
 """Tests for database service operations."""
 
+from types import SimpleNamespace
+
+import pytest
+
 from app.models.contact import ContactMessage
 from app.models.project import Project
 from app.models.story import Story
@@ -9,6 +13,38 @@ from app.schemas.story import StoryCreate
 from app.services.contact_service import ContactService
 from app.services.project_service import ProjectService
 from app.services.story_service import StoryService
+from app.services import auth_service
+
+
+@pytest.mark.asyncio
+async def test_welcome_email_retries_transient_smtp_failure(monkeypatch) -> None:
+    attempts = 0
+
+    async def send_email(subject, recipients, body):
+        nonlocal attempts
+        attempts += 1
+        if attempts < 3:
+            raise ConnectionError("temporary SMTP failure")
+
+    settings = SimpleNamespace(
+        MAIL_ENABLED=True,
+        MAIL_USERNAME="sender@example.com",
+        MAIL_PASSWORD="password",
+        MAIL_FROM="sender@example.com",
+        MAIL_SERVER="smtp.example.com",
+        MAIL_PORT=587,
+        MAIL_STARTTLS=True,
+        MAIL_SSL_TLS=False,
+        MAIL_RETRY_ATTEMPTS=3,
+        MAIL_RETRY_DELAY_SECONDS=0,
+    )
+    monkeypatch.setattr(auth_service, "get_settings", lambda: settings)
+    monkeypatch.setattr(auth_service, "Mail", lambda settings: SimpleNamespace(send_email=send_email))
+
+    user = SimpleNamespace(username="newuser", email="newuser@example.com")
+    await auth_service.AuthService.send_welcome_email(user)
+
+    assert attempts == 3
 
 
 def test_project_service_updates_and_deletes_projects(test_db) -> None:

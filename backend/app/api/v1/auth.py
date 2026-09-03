@@ -1,11 +1,12 @@
 """Authentication routes."""
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.security import get_current_user, public_user
+from app.core.task import Task
 from app.models.user import User
 from app.schemas.auth import LoginRequest, SignupRequest, TokenResponse
 from app.services.auth_service import AuthService
@@ -37,10 +38,12 @@ async def login(
 async def signup(
     request: SignupRequest,
     database: Annotated[Session, Depends(get_db)],
+    background_tasks: BackgroundTasks,
 ) -> TokenResponse:
     """Register new user account."""
     try:
         user = AuthService.create_user(database, request)
+        Task(background_tasks).add_task(AuthService.send_welcome_email, user)
     except ValueError as error:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,

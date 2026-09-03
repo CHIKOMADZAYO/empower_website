@@ -4,6 +4,9 @@ from functools import lru_cache
 from pathlib import Path
 
 
+
+   
+
 class Settings:
     """Application settings from environment variables."""
 
@@ -33,6 +36,18 @@ class Settings:
     CORS_ALLOW_METHODS: list[str] = ["*"]
     CORS_ALLOW_HEADERS: list[str] = ["*"]
 
+    #Email Configurations
+    # Email configuration. Email is disabled until credentials are provided.
+    MAIL_USERNAME: str = os.getenv("EMAIL_USERNAME", "")
+    MAIL_PASSWORD: str = os.getenv("EMAIL_PASSWORD", "")
+    MAIL_FROM: str = os.getenv("EMAIL_FROM", MAIL_USERNAME)
+    MAIL_PORT: int = int(os.getenv("EMAIL_PORT", "587"))
+    MAIL_SERVER: str = os.getenv("EMAIL_HOST", "")
+    MAIL_STARTTLS: bool = os.getenv("EMAIL_STARTTLS", "true").lower() == "true"
+    MAIL_SSL_TLS: bool = os.getenv("EMAIL_SSL_TLS", "false").lower() == "true"
+    MAIL_ENABLED: bool = os.getenv("EMAIL_ENABLED", "false").lower() == "true"
+    MAIL_RETRY_ATTEMPTS: int = int(os.getenv("EMAIL_RETRY_ATTEMPTS", "3"))
+    MAIL_RETRY_DELAY_SECONDS: float = float(os.getenv("EMAIL_RETRY_DELAY_SECONDS", "0.5"))
 
 @lru_cache()
 def get_settings() -> Settings:
