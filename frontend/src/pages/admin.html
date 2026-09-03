@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Empower administration dashboard.">
+    <title>Admin Dashboard | Empower</title>
+</head>
+<body class="admin-body">
+    <header>
+        <nav class="navbar" aria-label="Main navigation">
+            <a class="brand" href="index.html" aria-label="Empower home"><span class="brand-mark" aria-hidden="true">+</span><span>Empower</span></a>
+            <ul><li><a href="index.html">View site</a></li><li><button class="nav-donate" type="button" data-logout>Sign out</button></li></ul>
+        </nav>
+    </header>
+    <main class="admin-dashboard section-shell" data-admin-dashboard>
+        <div class="admin-header"><div><p class="eyebrow">Operations</p><h1>Admin dashboard</h1><p>Welcome back, <strong data-admin-user>administrator</strong>. Keep the public site current and respond to your community.</p></div><span class="admin-status" data-admin-status role="status" aria-live="polite"></span></div>
+        <section class="admin-metrics" aria-label="Content overview">
+            <article><span>Projects</span><strong data-count="projects">0</strong></article>
+            <article><span>Stories</span><strong data-count="stories">0</strong></article>
+            <article><span>Messages</span><strong data-count="contacts">0</strong></article>
+        </section>
+        <section class="admin-grid">
+            <article class="admin-panel"><div class="admin-panel-heading"><div><p class="eyebrow">Publish</p><h2>Add a project</h2></div></div><form class="admin-form" data-admin-form data-project-form><label for="project-name">Name</label><input id="project-name" name="name" required><label for="project-category">Category</label><input id="project-category" name="category" required><label for="project-summary">Summary</label><input id="project-summary" name="summary" required><label for="project-description">Description</label><textarea id="project-description" name="description" rows="3" required></textarea><button class="button button-primary" type="submit">Publish project</button></form></article>
+            <article class="admin-panel"><div class="admin-panel-heading"><div><p class="eyebrow">Publish</p><h2>Add a story</h2></div></div><form class="admin-form" data-admin-form data-story-form><label for="story-title">Title</label><input id="story-title" name="title" required><label for="story-category">Category</label><input id="story-category" name="category" required><label for="story-excerpt">Excerpt</label><textarea id="story-excerpt" name="excerpt" rows="3" required></textarea><label for="story-year">Year</label><input id="story-year" name="year" type="number" min="2000" max="2100" required><button class="button button-primary" type="submit">Publish story</button></form></article>
+        </section>
+        <section class="admin-grid admin-lists">
+            <article class="admin-panel"><div class="admin-panel-heading"><div><p class="eyebrow">Content</p><h2>Projects</h2></div></div><div data-project-list></div></article>
+            <article class="admin-panel"><div class="admin-panel-heading"><div><p class="eyebrow">Content</p><h2>Stories</h2></div></div><div data-story-list></div></article>
+            <article class="admin-panel admin-panel-wide"><div class="admin-panel-heading"><div><p class="eyebrow">Inbox</p><h2>Contact messages</h2></div></div><div data-contact-list></div></article>
+        </section>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="../scripts/admin.js"></script>
+</body>
+</html>

@@ -59,6 +59,10 @@ export async function signup(username, email, password) {
   });
 }
 
+export async function getProfile() {
+  return apiRequest('/auth/profile');
+}
+
 // Health Check
 export async function healthCheck() {
   return apiRequest('/health');
@@ -80,6 +84,10 @@ export async function createProject(name, category, summary, description) {
   });
 }
 
+export async function deleteProject(id) {
+  return apiRequest(`/projects/${id}`, { method: 'DELETE' });
+}
+
 // Stories Endpoints
 export async function getStories() {
   return apiRequest('/stories');
@@ -96,10 +104,22 @@ export async function createStory(title, category, excerpt, year) {
   });
 }
 
+export async function deleteStory(id) {
+  return apiRequest(`/stories/${id}`, { method: 'DELETE' });
+}
+
 // Contact Endpoints
 export async function submitContact(name, email, message) {
   return apiRequest('/contact', {
     method: 'POST',
     body: JSON.stringify({ name, email, message })
   });
+}
+
+export async function getContactMessages() {
+  return apiRequest('/contact');
+}
+
+export async function deleteContactMessage(id) {
+  return apiRequest(`/contact/${id}`, { method: 'DELETE' });
 }

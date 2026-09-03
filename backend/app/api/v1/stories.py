@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.security import require_roles
+from app.models.user import User
 from app.schemas.story import StoryCreate, StoryResponse
 from app.services.story_service import StoryService
 
@@ -38,6 +40,7 @@ async def get_story(
 async def create_story(
     story: StoryCreate,
     database: Annotated[Session, Depends(get_db)],
+    _: Annotated[User, Depends(require_roles("admin"))],
 ) -> StoryResponse:
     """Create new community story."""
     new_story = StoryService.create_story(database, story)
@@ -48,6 +51,7 @@ async def create_story(
 async def delete_story( 
     story_id: int,
     database: Annotated[Session, Depends(get_db)],
+    _: Annotated[User, Depends(require_roles("admin"))],
 ) -> None:
     """Delete community story by ID."""
     StoryService.delete_story(database, story_id)
@@ -58,6 +62,7 @@ async def update_story(
     story_id: int,
     story: StoryCreate,
     database: Annotated[Session, Depends(get_db)],
+    _: Annotated[User, Depends(require_roles("admin"))],
 ) -> StoryResponse:
     """Update community story by ID."""
     updated_story = StoryService.update_story(database, story_id, story)

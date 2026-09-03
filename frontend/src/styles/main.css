@@ -1428,6 +1428,227 @@ h2 {
     font-size: 1rem;
 }
 
+.admin-body {
+    background: #f1f4ee;
+}
+
+.admin-body .navbar {
+    background: #173b2a;
+}
+
+.admin-body .brand,
+.admin-body .navbar a {
+    color: #f8fbf5;
+}
+
+.admin-body .nav-donate {
+    border-color: #e9a15d;
+    background: #e9a15d;
+    color: #173b2a;
+}
+
+.admin-dashboard {
+    min-height: calc(100vh - 5rem);
+    padding-top: 4.5rem;
+    padding-bottom: 6rem;
+}
+
+.admin-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+}
+
+.admin-header h1 {
+    margin: 0.35rem 0 0.75rem;
+}
+
+.admin-header > div > p:last-child {
+    max-width: 650px;
+    color: #52665a;
+}
+
+.admin-status {
+    min-height: 1.5rem;
+    color: #1d6b4b;
+    font-family: 'Source Sans 3', Arial, sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.admin-status[data-state="error"] {
+    color: #b34d2b;
+}
+
+.admin-metrics,
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.admin-metrics {
+    margin-bottom: 1rem;
+}
+
+.admin-metrics article,
+.admin-panel {
+    border: 1px solid #dce5d8;
+    background: #fffdf8;
+}
+
+.admin-metrics article {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 1.35rem 1.5rem;
+}
+
+.admin-metrics span,
+.admin-row span {
+    color: #6a7b70;
+    font-family: 'Source Sans 3', Arial, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.admin-metrics strong {
+    color: #1d6b4b;
+    font-size: 2rem;
+}
+
+.admin-grid {
+    margin-bottom: 1rem;
+}
+
+.admin-panel {
+    padding: 1.5rem;
+}
+
+.admin-panel-heading {
+    margin-bottom: 1.25rem;
+}
+
+.admin-panel-heading h2 {
+    margin-top: 0.25rem;
+    font-size: 1.45rem;
+}
+
+.admin-form {
+    display: grid;
+    gap: 0.55rem;
+}
+
+.admin-form label {
+    margin-top: 0.45rem;
+    color: #24352c;
+    font-family: 'Source Sans 3', Arial, sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.admin-form input,
+.admin-form textarea {
+    width: 100%;
+    border: 1px solid #cbd8c9;
+    border-radius: 3px;
+    padding: 0.75rem;
+    background: #f8faf6;
+    color: #24352c;
+    font: inherit;
+}
+
+.admin-form input:focus,
+.admin-form textarea:focus {
+    outline: 2px solid #e9a15d;
+    outline-offset: 1px;
+}
+
+.admin-form .button {
+    margin-top: 1rem;
+}
+
+.admin-lists {
+    align-items: start;
+}
+
+.admin-panel-wide {
+    grid-column: span 3;
+}
+
+.admin-row {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-top: 1px solid #e5ebe2;
+}
+
+.admin-row:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.admin-row strong,
+.admin-row span,
+.admin-row p {
+    display: block;
+}
+
+.admin-row strong {
+    margin-bottom: 0.2rem;
+    color: #173b2a;
+}
+
+.admin-row p {
+    margin-top: 0.55rem;
+    color: #52665a;
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+.admin-delete {
+    flex: 0 0 auto;
+    border: 1px solid #e1b9a8;
+    border-radius: 3px;
+    padding: 0.45rem 0.7rem;
+    background: transparent;
+    color: #b34d2b;
+    font-family: 'Source Sans 3', Arial, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.admin-delete:hover,
+.admin-delete:focus-visible {
+    background: #fff0ea;
+}
+
+.admin-empty,
+.admin-denied {
+    color: #52665a;
+}
+
+.admin-denied {
+    max-width: 620px;
+    padding: 4rem 0;
+}
+
+.admin-denied h1 {
+    margin-bottom: 0.75rem;
+}
+
+.admin-denied .button {
+    display: inline-block;
+    margin-top: 1.5rem;
+}
+
 @media (max-width: 1024px) {
     .utility-bar-inner {
         width: min(100% - 4rem, 1180px);
@@ -1435,6 +1656,10 @@ h2 {
 
     .navbar {
         padding: 0 2rem;
+    }
+
+    .admin-panel-wide {
+        grid-column: span 1;
     }
 
     .hero {
@@ -1581,8 +1806,19 @@ h2 {
     .value-grid,
     .project-grid,
     .support-grid,
-    .footer-inner {
+    .footer-inner,
+    .admin-metrics,
+    .admin-grid {
         grid-template-columns: 1fr;
+    }
+
+    .admin-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-panel-wide {
+        grid-column: span 1;
     }
 
     .page-hero {
