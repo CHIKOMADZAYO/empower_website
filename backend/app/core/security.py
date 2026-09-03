@@ -84,3 +84,5 @@ def require_roles(*allowed_roles: str):
 def public_user(user: User) -> UserResponse:
     """Convert user model to public response schema."""
     return UserResponse(id=user.id, username=user.username, role=user.role)
+
+
