@@ -13,3 +13,13 @@ class UserResponse(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+
+
+class UserListResponse(BaseModel):
+    """User list response schema (admin only, includes email)."""
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    username: str
+    email: str
+    role: str

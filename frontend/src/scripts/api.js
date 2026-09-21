@@ -103,3 +103,8 @@ export async function submitContact(name, email, message) {
     body: JSON.stringify({ name, email, message })
   });
 }
+
+// User Endpoints (admin only)
+export async function getUsers() {
+  return apiRequest('/users');
+}
