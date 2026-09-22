@@ -1,28 +1,34 @@
-/* Responsive Design */
-
-/* Tablets */
-@media (max-width: 768px) {
-  .container {
-    padding: 0 15px;
-  }
-  
-  body {
-    font-size: 14px;
-  }
+/* Responsive — Empower premium theme */
+@media (max-width:1024px){
+  .hero-inner{grid-template-columns:1fr;gap:2.2rem;padding:3rem 24px 3.5rem}
+  .hero-photo img{height:360px}
+  .float-1{left:8px}.float-2{right:8px}
+  .stats-band{grid-template-columns:repeat(2,1fr)}
+  .pillars,.projects-grid,.testimonials{grid-template-columns:repeat(2,1fr)}
+  .impact-split,.donate-cta,.newsletter-inner{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr 1fr}
 }
-
-/* Mobile */
-@media (max-width: 480px) {
-  .container {
-    padding: 0 10px;
-  }
-  
-  .btn {
-    width: 100%;
-    display: block;
-  }
-  
-  .card {
-    padding: var(--spacing-md);
-  }
+@media (max-width:768px){
+  .topbar{display:none}
+  .nav-toggle{display:inline-flex}
+  .navbar{flex-wrap:wrap}
+  .navbar ul{display:none;width:100%;flex-direction:column;align-items:stretch;background:#fff;border:1px solid var(--line);border-radius:16px;padding:.6rem;margin-top:.6rem;box-shadow:var(--shadow-md)}
+  .navbar.nav-open ul{display:flex}
+  .navbar ul a{padding:.85rem 1rem}
+  .navbar .nav-donate{text-align:center;margin:.4rem 0 0}
+  .page-section{padding:3.2rem 0}
+  .pillars,.projects-grid,.testimonials{grid-template-columns:1fr}
+  .hero h1{font-size:clamp(2.2rem,9vw,3rem)}
+  .hero-proof{gap:1.1rem}
+  .stats-band{padding:1.8rem;gap:1.2rem}
+  .donate-cta{padding:2rem}
+  .rounded-img img{height:340px}
+  .amount-grid{grid-template-columns:repeat(3,1fr)}
+  .footer-inner{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+  .hero-actions .btn,.hero-actions .button{width:100%}
+  .stats-band{grid-template-columns:1fr 1fr;padding:1.4rem}
+  .amount-grid{grid-template-columns:1fr 1fr}
+  .float-card{display:none}
 }
