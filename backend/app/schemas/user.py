@@ -23,3 +23,10 @@ class UserListResponse(BaseModel):
     username: str
     email: str
     role: str
+    
+class UserUpdate(BaseModel):
+    """Updating Users Will be  done by the Admin"""
+    id:int
+    username:str
+    email:str
+    role:str
