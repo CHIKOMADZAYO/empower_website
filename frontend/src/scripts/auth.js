@@ -2,7 +2,7 @@
  * Empower Frontend - Authentication Module
  */
 
-import { getProfile, login, signup } from './api.js';
+import { login, signup } from './api.js';
 
 /**
  * Set authentication token
@@ -25,25 +25,6 @@ export function clearToken() {
   localStorage.removeItem('token');
 }
 
-export function setStoredUser(user) {
-  if (user) localStorage.setItem('user', JSON.stringify(user));
-}
-
-export function getStoredUser() {
-  try {
-    const raw = localStorage.getItem('user');
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-export function logout(redirect = '/login.html') {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-  window.location.href = redirect;
-}
-
 /**
  * Check if user is authenticated
  */
@@ -57,24 +38,6 @@ export function isAuthenticated() {
 export function requireAuth() {
   if (!isAuthenticated()) {
     window.location.href = '/login.html';
-  }
-}
-
-export async function requireRole(allowedRoles, redirect = '/login.html') {
-  requireAuth();
-  if (!allowedRoles || allowedRoles.length === 0) return getStoredUser();
-  try {
-    const profile = await getProfile();
-    const user = profile?.user ?? profile;
-    if (user) setStoredUser(user);
-    if (!user || !allowedRoles.includes(user.role)) {
-      window.location.href = redirect;
-      return null;
-    }
-    return user;
-  } catch {
-    window.location.href = redirect;
-    return null;
   }
 }
 
@@ -98,14 +61,6 @@ export function decodeToken(token) {
   }
 }
 
-/**
- * Decide where to send a user after login/signup based on JWT role.
- */
-export function dashboardForRole(role) {
-  if (role === 'admin') return 'admin.html';
-  return 'dashboard.html';
-}
-
 function setFormStatus(selector, message, isError = false) {
   const status = document.querySelector(selector);
   if (!status) return;
@@ -114,28 +69,8 @@ function setFormStatus(selector, message, isError = false) {
   status.style.color = isError ? '#b42318' : '#0f766e';
 }
 
-async function finishAuth(response, statusSelector) {
-  const token = response?.access_token;
-  if (!token) throw new Error('No access token received');
-  setToken(token);
-
-  let role = decodeToken(token)?.role;
-  try {
-    const profile = await getProfile();
-    const user = profile?.user ?? null;
-    if (user) {
-      setStoredUser(user);
-      role = user.role;
-    }
-  } catch {
-    // fall back to JWT role
-  }
-
-  setFormStatus(statusSelector, 'Signed in successfully. Redirecting...');
-  window.location.href = dashboardForRole(role);
-}
-
 export async function handleLoginSubmit(event) {
+  //Clearing Everything after 
   event.preventDefault();
 
   const form = event.currentTarget;
@@ -150,7 +85,15 @@ export async function handleLoginSubmit(event) {
   try {
     setFormStatus('[data-login-status]', 'Signing in...');
     const response = await login(username, password);
-    await finishAuth(response, '[data-login-status]');
+    const token = response?.access_token;
+
+    if (!token) {
+      throw new Error('No access token received');
+    }
+
+    setToken(token);
+    setFormStatus('[data-login-status]', 'Signed in successfully. Redirecting...');
+    window.location.href = 'projects.html';
   } catch (error) {
     setFormStatus('[data-login-status]', error.message || 'Unable to sign in. Please try again.', true);
   }
@@ -178,7 +121,15 @@ export async function handleSignupSubmit(event) {
   try {
     setFormStatus('[data-signup-status]', 'Creating your account...');
     const response = await signup(username, email, password);
-    await finishAuth(response, '[data-signup-status]');
+    const token = response?.access_token;
+
+    if (!token) {
+      throw new Error('No access token received');
+    }
+
+    setToken(token);
+    setFormStatus('[data-signup-status]', 'Account created successfully. Redirecting...');
+    window.location.href = 'projects.html';
   } catch (error) {
     setFormStatus('[data-signup-status]', error.message || 'Unable to create account. Please try again.', true);
   }
@@ -194,16 +145,8 @@ export function bindAuthForms() {
   if (signupForm) {
     signupForm.addEventListener('submit', handleSignupSubmit);
   }
-
-  document.querySelectorAll('[data-logout]').forEach((button) => {
-    button.addEventListener('click', (event) => {
-      event.preventDefault();
-      logout();
-    });
-  });
 }
 
 if (typeof window !== 'undefined') {
   window.addEventListener('DOMContentLoaded', bindAuthForms);
 }
-
