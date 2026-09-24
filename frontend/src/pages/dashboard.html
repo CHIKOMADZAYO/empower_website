@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Your Empower workspace — projects, stories and messages."
+    />
+    <title>My Dashboard | Empower</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div class="dash">
+      <aside class="dash-side">
+        <div class="dash-brand">
+          <span class="brand-mark">X</span
+          ><span>Empower<small>Member workspace</small></span>
+        </div>
+        <nav class="dash-nav" data-dash-nav>
+          <button data-view="overview" class="active">
+            <span class="ico">O</span>Overview
+          </button>
+          <button data-view="projects">
+            <span class="ico">P</span>Projects
+          </button>
+          <button data-view="stories"><span class="ico">S</span>Stories</button>
+          <button data-view="messages">
+            <span class="ico">M</span>My messages
+          </button>
+          <a href="index.html"><span class="ico">H</span>View site</a>
+          <button data-logout><span class="ico">X</span>Sign out</button>
+        </nav>
+        <div class="dash-side-foot">
+          <strong id="user-name">Member</strong><br /><span
+            id="user-email"
+          ></span
+          ><br /><span class="badge" style="margin-top: 0.5rem" id="user-role"
+            >VIEWER</span
+          >
+        </div>
+      </aside>
+      <main class="dash-main">
+        <div class="dash-top">
+          <div>
+            <h1 id="dash-title">Overview</h1>
+            <p>Follow the work, share stories and stay in touch.</p>
+          </div>
+          <label class="dash-search"
+            >Search<input data-dash-search placeholder="Search..."
+          /></label>
+          <div class="dash-user">
+            <span class="dash-avatar" id="user-avatar">M</span
+            ><strong id="user-hello">Hi</strong>
+          </div>
+        </div>
+        <div class="dash-body">
+          <div data-toast hidden class="toast"></div>
+          <section class="view active" data-view-panel="overview">
+            <div class="stat-grid" id="user-stats">
+              <div class="stat">
+                <h3>Loading</h3>
+                <div class="num">...</div>
+              </div>
+            </div>
+            <div class="dash-panels">
+              <div class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h2>Latest projects</h2>
+                    <p>What the community is building now.</p>
+                  </div>
+                  <button
+                    class="button button-ghost btn-sm"
+                    data-goto="projects"
+                  >
+                    View all
+                  </button>
+                </div>
+                <div class="panel-body" id="latest-projects">
+                  <p class="empty">Loading...</p>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="panel-head">
+                  <div>
+                    <h2>Send a message</h2>
+                    <p>Talk to the Empower team.</p>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <form
+                    data-quick-contact
+                    class="form-card"
+                    style="box-shadow: none; border: none; padding: 0"
+                  >
+                    <label
+                      >Name<input name="name" required minlength="2" /></label
+                    ><label
+                      >Email<input name="email" type="email" required /></label
+                    ><label class="full" style="grid-column: 1/-1"
+                      >Message<textarea
+                        name="message"
+                        rows="3"
+                        required
+                        minlength="10"
+                      ></textarea></label
+                    ><button class="button button-primary btn-sm" type="submit">
+                      Send message
+                    </button>
+                    <p data-quick-status role="status"></p>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="view" data-view-panel="projects">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Projects</h2>
+                  <p id="projects-count"></p>
+                </div>
+              </div>
+              <div class="panel-body" id="projects-list">
+                <p class="empty">Loading...</p>
+              </div>
+            </div>
+          </section>
+          <section class="view" data-view-panel="stories">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>Stories</h2>
+                  <p id="stories-count"></p>
+                </div>
+                <button class="button button-primary btn-sm" data-new-story>
+                  + Share a story
+                </button>
+              </div>
+              <div class="panel-body" id="stories-list">
+                <p class="empty">Loading...</p>
+              </div>
+            </div>
+          </section>
+          <section class="view" data-view-panel="messages">
+            <div class="panel">
+              <div class="panel-head">
+                <div>
+                  <h2>My messages</h2>
+                  <p>Messages sent with your account email.</p>
+                </div>
+              </div>
+              <div class="panel-body" id="messages-list">
+                <p class="empty">Loading...</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+    <div class="modal-backdrop" data-modal>
+      <div class="modal">
+        <h3>Share a story</h3>
+        <form
+          data-story-form
+          class="form-card"
+          style="box-shadow: none; border: none; padding: 1rem 0 0"
+        >
+          <div class="form-grid">
+            <label>Title<input name="title" required minlength="2" /></label
+            ><label>Category<input name="category" required /></label
+            ><label
+              >Year<input
+                name="year"
+                type="number"
+                value="2026"
+                required /></label
+            ><label class="full"
+              >Excerpt<textarea
+                name="excerpt"
+                rows="4"
+                required
+                minlength="10"
+              ></textarea>
+            </label>
+          </div>
+          <div style="display: flex; gap: 0.6rem; margin-top: 1rem">
+            <button class="button button-primary" type="submit">Publish</button
+            ><button class="button button-ghost" type="button" data-modal-close>
+              Cancel
+            </button>
+          </div>
+          <p data-story-status role="status"></p>
+        </form>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/scripts/dashboard.js"></script>
+  </body>
+</html>

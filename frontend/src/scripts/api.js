@@ -26,7 +26,10 @@ async function apiRequest(endpoint, options = {}) {
 
     if (response.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login.html';
+      localStorage.removeItem('user');
+      if (!window.location.pathname.includes('login.html')) {
+        window.location.href = '/login.html';
+      }
       return null;
     }
 
@@ -59,6 +62,19 @@ export async function signup(username, email, password) {
   });
 }
 
+export async function getProfile() {
+  return apiRequest('/auth/profile');
+}
+
+// Dashboard Endpoints
+export async function getAdminDashboard() {
+  return apiRequest('/dashboard/admin');
+}
+
+export async function getMyDashboard() {
+  return apiRequest('/dashboard/me');
+}
+
 // Health Check
 export async function healthCheck() {
   return apiRequest('/health');
@@ -80,6 +96,17 @@ export async function createProject(name, category, summary, description) {
   });
 }
 
+export async function updateProject(id, payload) {
+  return apiRequest(`/projects/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+}
+
+export async function deleteProject(id) {
+  return apiRequest(`/projects/${id}`, { method: 'DELETE' });
+}
+
 // Stories Endpoints
 export async function getStories() {
   return apiRequest('/stories');
@@ -96,6 +123,17 @@ export async function createStory(title, category, excerpt, year) {
   });
 }
 
+export async function updateStory(id, payload) {
+  return apiRequest(`/stories/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload)
+  });
+}
+
+export async function deleteStory(id) {
+  return apiRequest(`/stories/${id}`, { method: 'DELETE' });
+}
+
 // Contact Endpoints
 export async function submitContact(name, email, message) {
   return apiRequest('/contact', {
@@ -104,7 +142,16 @@ export async function submitContact(name, email, message) {
   });
 }
 
+export async function getContactMessages() {
+  return apiRequest('/contact');
+}
+
+export async function deleteContactMessage(id) {
+  return apiRequest(`/contact/${id}`, { method: 'DELETE' });
+}
+
 // User Endpoints (admin only)
 export async function getUsers() {
   return apiRequest('/users');
 }
+

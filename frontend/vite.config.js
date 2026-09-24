@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 
-const pageNames = ['about', 'admin', 'contact', 'donate', 'login', 'projects', 'signup', 'stories', 'support']
+const pageNames = ['about', 'admin', 'contact', 'dashboard', 'donate', 'login', 'projects', 'signup', 'stories', 'support']
 
 export default defineConfig({
   plugins: [{
@@ -39,6 +39,7 @@ export default defineConfig({
         about: 'src/pages/about.html',
         admin: 'src/pages/admin.html',
         contact: 'src/pages/contact.html',
+        dashboard: 'src/pages/dashboard.html',
         donate: 'src/pages/donate.html',
         login: 'src/pages/login.html',
         projects: 'src/pages/projects.html',

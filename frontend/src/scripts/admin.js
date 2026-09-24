@@ -1,78 +1,20 @@
-/**
- * Empower Frontend - Admin dashboard
- * Renders the list of registered users (admin-only endpoint).
- */
-
-import { getUsers } from './api.js';
-import { requireAuth } from './auth.js';
-
-/**
- * Build a single user card using textContent to avoid XSS injection.
- */
-function createUserElement(user) {
-  const userDiv = document.createElement('div');
-  userDiv.classList.add('user');
-
-  const fields = [
-    { label: 'ID', value: user.id },
-    { label: 'Name', value: user.username },
-    { label: 'Email', value: user.email },
-    { label: 'Role', value: user.role },
-  ];
-
-  fields.forEach(({ label, value }) => {
-    const paragraph = document.createElement('p');
-    const strong = document.createElement('strong');
-    strong.textContent = `${label}:`;
-    paragraph.append(strong, ` ${value ?? ''}`);
-    userDiv.appendChild(paragraph);
-  });
-
-  return userDiv;
-}
-
-/**
- * Render the user list into the admin panel.
- */
-function renderUsers(container, users) {
-  container.innerHTML = '';
-
-  if (!users || users.length === 0) {
-    const empty = document.createElement('p');
-    empty.textContent = 'No users found.';
-    container.appendChild(empty);
-    return;
-  }
-
-  users.forEach((user) => container.appendChild(createUserElement(user)));
-}
-
-/**
- * Load users from the API and display them in the admin panel.
- */
-export async function displayUserData() {
-  const userDataContainer = document.getElementById('user-data');
-  if (!userDataContainer) return;
-
-  userDataContainer.textContent = 'Loading users...';
-
-  try {
-    const users = await getUsers();
-    renderUsers(userDataContainer, users);
-  } catch (error) {
-    const message = document.createElement('p');
-    message.setAttribute('role', 'alert');
-    message.textContent = error.message || 'Users could not be loaded. Please try again later.';
-    userDataContainer.innerHTML = '';
-    userDataContainer.appendChild(message);
-  }
-}
-
-if (typeof window !== 'undefined') {
-  window.addEventListener('DOMContentLoaded', () => {
-    requireAuth();
-    displayUserData();
-  });
-}
-
-export default displayUserData;
+import { createProject, createStory, deleteContactMessage, deleteProject, deleteStory, getAdminDashboard, getContactMessages, getProjects, getStories, getUsers, updateProject, updateStory } from './api.js';
+import { logout, requireRole } from './auth.js';
+const state = { summary: null, projects: [], stories: [], messages: [], users: [], user: null };
+let modalMode = null; let editingId = null;
+function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+function esc(v) { return String(v ?? ''); }
+function toast(msg) { const t = document.querySelector('[data-toast]'); if (!t) return; t.hidden = false; t.textContent = msg; clearTimeout(t._h); t._h = setTimeout(() => { t.hidden = true; }, 3200); }
+function switchView(name) { document.querySelectorAll('[data-dash-nav] [data-view]').forEach((b) => b.classList.toggle('active', b.dataset.view === name)); document.querySelectorAll('[data-view-panel]').forEach((p) => p.classList.toggle('active', p.dataset.viewPanel === name)); const t = document.getElementById('dash-title'); if (t) t.textContent = name[0].toUpperCase() + name.slice(1); }
+function openModal(title, sub, fields) { modalMode = title; document.getElementById('modal-title').textContent = title; document.getElementById('modal-sub').textContent = sub || ''; const wrap = document.getElementById('modal-fields'); wrap.innerHTML = ''; fields.forEach((f) => { const label = el('label', f.full ? 'full' : '', f.label); let input; if (f.type === 'textarea') { input = document.createElement('textarea'); input.rows = 4; } else { input = document.createElement('input'); input.type = f.type || 'text'; } input.name = f.name; input.required = f.required !== false; input.value = f.value ?? ''; if (f.min !== undefined) input.minLength = f.min; label.appendChild(input); if (f.full) label.style.gridColumn = '1/-1'; wrap.appendChild(label); }); document.querySelector('[data-modal]').classList.add('open'); }
+function closeModal() { document.querySelector('[data-modal]').classList.remove('open'); }
+function renderStats(s) { const grid = document.getElementById('admin-stats'); grid.innerHTML = ''; const cards = [['Community members', s.total_users, Object.keys(s.users_by_role).length + ' roles'], ['Active projects', s.total_projects, Object.keys(s.projects_by_category).length + ' focus areas'], ['Published stories', s.total_stories, Object.keys(s.stories_by_category).length + ' themes'], ['Inbox messages', s.total_messages, 'needs review']]; cards.forEach(([h, n, sub], i) => { const d = el('div', i === 0 ? 'stat accent' : 'stat'); d.append(el('h3', '', h), el('div', 'num', String(n)), el('div', 'sub', sub)); grid.appendChild(d); }); const mix = document.getElementById('admin-mix'); mix.innerHTML = ''; const mk = (title, obj) => { const w = el('div'); w.appendChild(el('strong', '', title)); const row = el('div', 'chip-row'); Object.entries(obj).forEach(([k, v]) => row.appendChild(el('span', 'chip', k + ': ' + v))); if (!Object.keys(obj).length) row.appendChild(el('span', 'chip', 'No data yet')); w.appendChild(row); return w; }; mix.append(mk('Roles', s.users_by_role), mk('Project focus', s.projects_by_category), mk('Story themes', s.stories_by_category)); const recent = document.getElementById('recent-messages'); recent.innerHTML = ''; if (!s.recent_messages.length) recent.appendChild(el('p', 'empty', 'Inbox is clear.')); s.recent_messages.slice(0, 4).forEach((m) => { const c = el('div', 'card'); c.style.padding = '1rem'; c.append(el('strong', '', m.name + ' - ' + m.email), el('p', '', m.message)); recent.appendChild(c); }); }
+function rowActions(onEdit, onDelete) { const w = el('div', 'row-actions'); const e = el('button', 'icon-btn', 'Edit'); e.type = 'button'; e.onclick = onEdit; const d = el('button', 'icon-btn danger', 'Delete'); d.type = 'button'; d.onclick = onDelete; w.append(e, d); return w; }
+function renderProjects(filter) { filter = filter || ''; const tb = document.getElementById('projects-tbody'); tb.innerHTML = ''; const rows = state.projects.filter((p) => JSON.stringify(p).toLowerCase().includes(filter.toLowerCase())); document.getElementById('projects-count').textContent = rows.length + ' projects shown'; if (!rows.length) { const tr = el('tr'); const td = el('td', '', 'No projects match.'); td.colSpan = 4; tr.appendChild(td); tb.appendChild(tr); return; } rows.forEach((p) => { const tr = el('tr'); const tdN = el('td'); tdN.append(el('strong', '', esc(p.name))); tr.append(tdN, el('td', '', esc(p.category)), el('td', '', esc(p.summary))); const tdA = el('td'); tdA.appendChild(rowActions(() => { editingId = p.id; openModal('Edit project', p.name, [{ label: 'Name', name: 'name', value: p.name, min: 2 }, { label: 'Category', name: 'category', value: p.category, min: 2 }, { label: 'Summary', name: 'summary', value: p.summary, full: true, min: 2 }, { label: 'Description', name: 'description', value: p.description, type: 'textarea', full: true, min: 10 }]); }, async () => { if (confirm('Delete project ' + p.name + '?')) { await deleteProject(p.id); toast('Project deleted'); await reloadTables(); } })); tr.appendChild(tdA); tb.appendChild(tr); }); }
+function renderStories(filter) { filter = filter || ''; const tb = document.getElementById('stories-tbody'); tb.innerHTML = ''; const rows = state.stories.filter((s) => JSON.stringify(s).toLowerCase().includes(filter.toLowerCase())); document.getElementById('stories-count').textContent = rows.length + ' stories shown'; if (!rows.length) { const tr = el('tr'); const td = el('td', '', 'No stories match.'); td.colSpan = 4; tr.appendChild(td); tb.appendChild(tr); return; } rows.forEach((s) => { const tr = el('tr'); const tdT = el('td'); tdT.append(el('strong', '', esc(s.title))); tr.append(tdT, el('td', '', esc(s.category)), el('td', '', esc(String(s.year)))); const tdA = el('td'); tdA.appendChild(rowActions(() => { editingId = s.id; openModal('Edit story', s.title, [{ label: 'Title', name: 'title', value: s.title, full: true, min: 2 }, { label: 'Category', name: 'category', value: s.category, min: 2 }, { label: 'Year', name: 'year', type: 'number', value: s.year }, { label: 'Excerpt', name: 'excerpt', value: s.excerpt, type: 'textarea', full: true, min: 10 }]); }, async () => { if (confirm('Delete story ' + s.title + '?')) { await deleteStory(s.id); toast('Story deleted'); await reloadTables(); } })); tr.appendChild(tdA); tb.appendChild(tr); }); }
+function renderMessages(filter) { filter = filter || ''; const list = document.getElementById('messages-list'); list.innerHTML = ''; const rows = state.messages.filter((m) => JSON.stringify(m).toLowerCase().includes(filter.toLowerCase())); document.getElementById('messages-count').textContent = rows.length + ' messages'; if (!rows.length) { list.appendChild(el('p', 'empty', 'No messages.')); return; } rows.forEach((m) => { const c = el('div', 'card'); c.style.padding = '1rem'; const head = el('div'); head.style.display = 'flex'; head.style.justifyContent = 'space-between'; head.style.gap = '.6rem'; head.append(el('strong', '', m.name + ' <' + m.email + '>')); const del = el('button', 'icon-btn danger', 'Delete'); del.type = 'button'; del.onclick = async () => { if (confirm('Delete this message?')) { await deleteContactMessage(m.id); toast('Message deleted'); await reloadTables(); } }; head.appendChild(del); c.append(head, el('p', '', m.message)); list.appendChild(c); }); }
+function renderUsers(filter) { filter = filter || ''; const tb = document.getElementById('users-tbody'); tb.innerHTML = ''; const rows = state.users.filter((u) => JSON.stringify(u).toLowerCase().includes(filter.toLowerCase())); document.getElementById('users-count').textContent = rows.length + ' accounts'; rows.forEach((u) => { const tr = el('tr'); const tdU = el('td'); tdU.append(el('strong', '', esc(u.username)), document.createTextNode(' '), el('span', 'badge ' + esc(u.role), esc(u.role))); tr.append(tdU, el('td', '', esc(u.email)), el('td', '', esc(u.role))); tb.appendChild(tr); }); }
+async function reloadTables() { const summary = await getAdminDashboard(); const projects = await getProjects(); const stories = await getStories(); const messages = await getContactMessages(); const users = await getUsers(); state.summary = summary; state.projects = projects; state.stories = stories; state.messages = messages; state.users = users; renderStats(summary); const q = document.querySelector('[data-dash-search]')?.value || ''; renderProjects(q); renderStories(q); renderMessages(q); renderUsers(q); }
+function bindModal() { document.querySelector('[data-modal-close]').addEventListener('click', closeModal); document.querySelector('[data-modal-form]').addEventListener('submit', async (e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); const status = document.querySelector('[data-modal-status]'); try { status.textContent = 'Saving...'; const data = Object.fromEntries(fd.entries()); if (modalMode.includes('project')) { if (editingId) await updateProject(editingId, data); else await createProject(data.name, data.category, data.summary, data.description); } else { data.year = Number(data.year); if (editingId) await updateStory(editingId, data); else await createStory(data.title, data.category, data.excerpt, data.year); } status.textContent = 'Saved.'; closeModal(); editingId = null; e.currentTarget.reset(); toast('Saved successfully'); await reloadTables(); } catch (err) { status.textContent = err.message || 'Could not save.'; } }); }
+async function init() { const user = await requireRole(['admin'], '/dashboard.html'); if (!user) return; state.user = user; document.getElementById('admin-name').textContent = user.username; document.getElementById('admin-email').textContent = user.email || ''; document.getElementById('admin-hello').textContent = 'Hi, ' + user.username; document.getElementById('admin-avatar').textContent = (user.username || 'A')[0].toUpperCase(); document.querySelectorAll('[data-dash-nav] [data-view]').forEach((b) => b.addEventListener('click', () => switchView(b.dataset.view))); document.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => switchView(b.dataset.goto))); document.querySelector('[data-logout]').addEventListener('click', () => logout()); document.querySelector('[data-dash-search]').addEventListener('input', (e) => { renderProjects(e.target.value); renderStories(e.target.value); renderMessages(e.target.value); renderUsers(e.target.value); }); document.querySelector('[data-new-project]').addEventListener('click', () => { editingId = null; openModal('New project', 'Create a community project.', [{ label: 'Name', name: 'name', min: 2 }, { label: 'Category', name: 'category', min: 2 }, { label: 'Summary', name: 'summary', full: true, min: 2 }, { label: 'Description', name: 'description', type: 'textarea', full: true, min: 10 }]); }); document.querySelector('[data-new-story]').addEventListener('click', () => { editingId = null; openModal('New story', 'Publish a community story.', [{ label: 'Title', name: 'title', full: true, min: 2 }, { label: 'Category', name: 'category', min: 2 }, { label: 'Year', name: 'year', type: 'number', value: new Date().getFullYear() }, { label: 'Excerpt', name: 'excerpt', type: 'textarea', full: true, min: 10 }]); }); bindModal(); try { await reloadTables(); } catch (err) { toast(err.message || 'Dashboard failed to load'); } }
+init();
