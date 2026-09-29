@@ -2,10 +2,11 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Request
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.services.logs_service import record_activity
 from app.core.security import require_roles
 from app.models.user import User
 from app.schemas.contact import (
@@ -20,20 +21,41 @@ router = APIRouter(prefix="/contact", tags=["contact"])
 
 @router.post("", response_model=ContactMessageResponse, status_code=status.HTTP_201_CREATED)
 async def create_contact_message(
+    request:Request,
     contact_data: ContactMessageCreate,
     database: Annotated[Session, Depends(get_db)],
 ) -> ContactMessageResponse:
     """Submit contact form message."""
+    await record_activity(
+        database,
+        user_id=User.id,
+        action="USER SENT A MESSAGE",
+        resource="user",
+        resource_id=str(User.id),
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent"),
+    )
     return ContactService.create_message(database, contact_data)
 
 
 @router.get("", response_model=list[ContactMessageListResponse])
 async def list_contact_messages(
+    request:Request,
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles("admin"))],
 ) -> list[ContactMessageListResponse]:
     """Get all contact messages (admin only)."""
     messages = ContactService.get_all_messages(database)
+    
+    await record_activity(
+        database,
+        user_id=User.id,
+        action="ADMIN LISTS ALL MESSAGE",
+        resource="user",
+        resource_id=str(User.id),
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent"),
+    )
     return [ContactMessageListResponse.model_validate(m) for m in messages]
 
 

@@ -1,5 +1,7 @@
 """FastAPI application factory."""
 
+import logging
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -7,9 +9,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import v1_router
 from app.core.config import get_settings
+from app.middleware.request_logging import request_logging_middleware
 from app.core.database import init_db
 
 settings = get_settings()
+
+logger = logging.getLogger(__name__)
+
+
 
 
 def seed_database() -> None:
@@ -112,6 +119,9 @@ def create_app() -> FastAPI:
         allow_methods=settings.CORS_ALLOW_METHODS,
         allow_headers=settings.CORS_ALLOW_HEADERS,
     )
+    
+    
+    app.middleware("http")(request_logging_middleware)
 
     # Include routers
     app.include_router(v1_router)

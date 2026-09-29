@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -10,12 +10,15 @@ from app.core.security import get_current_user, public_user
 from app.models.user import User
 from app.schemas.auth import LoginRequest, SignupRequest, TokenResponse
 from app.services.auth_service import AuthService
+from app.services.logs_service import record_activity
+
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/login", response_model=TokenResponse, status_code=status.HTTP_200_OK)
 async def login(
+    request:Request,
     credentials: LoginRequest,
     database: Annotated[Session, Depends(get_db)],
 ) -> TokenResponse:
@@ -26,11 +29,23 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid username or password",
         )
+    
+    await record_activity(
+        database,
+        user_id=user.id,
+        action="USER_LOGINS",
+        resource="user",
+        resource_id=str(user.id),
+        ip_address=request.client.host,
+        user_agent=request.headers.get("user-agent"),
+    )
+    
     return AuthService.get_token_response(user)
 
 
 @router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def signup(
+    required:Request,
     request: SignupRequest,
     database: Annotated[Session, Depends(get_db)],
 ) -> TokenResponse:
@@ -42,6 +57,17 @@ async def signup(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(error),
         ) from error
+        
+        
+    await record_activity(
+        database,
+        user_id=user.id,
+        action="user_login",
+        resource="user",
+        resource_id=str(user.id),
+        ip_address=required.client.host,
+        user_agent=required.headers.get("user-agent"),
+    )
 
     return AuthService.get_token_response(user)
 
