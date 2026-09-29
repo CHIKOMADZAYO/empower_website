@@ -1,0 +1,100 @@
+[project]
+name = "empower"
+version = "1.0.0"
+description = "Empower community platform — FastAPI backend + automation CLI."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "sqlalchemy>=2.0",
+  "alembic>=1.13",
+  "pydantic>=2.7",
+  "pydantic-settings>=2.0",
+  "python-dotenv>=1.0",
+  "psycopg[binary]>=3.1",
+  "redis>=5.0",
+  "PyJWT>=2.8",
+  "pwdlib[argon2]>=0.2",
+  "httpx>=0.27",
+  "email-validator>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+  "pytest-cov>=5.0",
+  "ruff>=0.5",
+  "mypy>=1.10",
+  "bandit>=1.7",
+  "pip-audit>=2.7",
+  "build>=1.2",
+]
+test = [
+  "pytest>=8.0",
+  "pytest-asyncio>=0.23",
+  "pytest-cov>=5.0",
+  "httpx>=0.27",
+]
+
+[project.scripts]
+empower-auto = "automation.cli.app:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests", "automation/tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
+markers = [
+  "integration: integration tests (DB, API, containers)",
+]
+
+[tool.coverage.run]
+source = ["backend/app", "automation"]
+omit = ["*/tests/*", "*/__pycache__/*"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["backend", "automation"]
+exclude = [".venv", "venv", "__pycache__", "frontend", "node_modules", "dist"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "S", "W"]
+ignore = ["S101"]
+unfixable = []
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["E501", "S101", "S105", "S106"]
+"tests/**/*.py" = ["E501", "S101", "S105", "S106"]
+"**/tests/*.py" = ["E501", "S101", "S105", "S106"]
+"**/tests/**/*.py" = ["E501", "S101", "S105", "S106"]
+"backend/scripts/*.py" = ["E402"]
+"automation/utils/output.py" = ["E402"]
+"automation/utils/process.py" = ["S603"]
+"backend/scripts/migrate.py" = ["S603"]
+"automation/services/ops_service.py" = ["S310"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.12"
+explicit_package_bases = true
+mypy_path = "backend"
+show_error_codes = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+ignore_missing_imports = true
+[[tool.mypy.overrides]]
+module = "automation.*"
+ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "frontend"]
+skips = ["B101"]

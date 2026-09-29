@@ -78,5 +78,5 @@ def seed_database() -> None:
     print("Database seeding completed")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     seed_database()

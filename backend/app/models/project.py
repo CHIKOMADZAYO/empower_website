@@ -1,4 +1,5 @@
 """Project domain model."""
+
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -7,6 +8,7 @@ from app.core.database import Base
 
 class Project(Base):
     """Community project model."""
+
     __tablename__ = "projects"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)

@@ -1,4 +1,5 @@
 """Test module for authentication endpoints."""
+
 from fastapi.testclient import TestClient
 
 

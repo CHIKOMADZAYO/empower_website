@@ -1,4 +1,5 @@
 """Schemas module - Pydantic request/response models."""
+
 from app.schemas.auth import LoginRequest, SignupRequest, TokenResponse
 from app.schemas.contact import (
     ContactMessageCreate,

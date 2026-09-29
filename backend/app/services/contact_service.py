@@ -1,5 +1,6 @@
 """Contact message service - business logic for contact operations."""
-from datetime import datetime, timezone
+
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -13,8 +14,7 @@ class ContactService:
 
     @staticmethod
     def create_message(
-        database: Session,
-        contact_data: ContactMessageCreate
+        database: Session, contact_data: ContactMessageCreate
     ) -> ContactMessageResponse:
         """Create and store contact message."""
         message = ContactMessage(
@@ -27,40 +27,32 @@ class ContactService:
 
         return ContactMessageResponse(
             message="Thank you. Your message has been received by the Empower team.",
-            received_at=datetime.now(timezone.utc),
+            received_at=datetime.now(UTC),
         )
 
     @staticmethod
     def get_all_messages(database: Session) -> list[ContactMessage]:
         """Get all contact messages (admin only)."""
-        return database.scalars(
+        rows = database.scalars(
             select(ContactMessage).order_by(ContactMessage.created_at.desc())
         ).all()
+        return list(rows)
 
     @staticmethod
     def get_message_by_id(database: Session, message_id: int) -> ContactMessage | None:
         """Get contact message by ID."""
-        return database.scalar(
-            select(ContactMessage).where(ContactMessage.id == message_id)
-        )
+        return database.scalar(select(ContactMessage).where(ContactMessage.id == message_id))
+
     @staticmethod
     def get_message_by_email(database: Session, email: str) -> list[ContactMessage]:
         """Get contact messages by email."""
-        return database.scalars(
-            select(ContactMessage).where(ContactMessage.email == email)
-        ).all() 
-
-
-    
+        rows = database.scalars(select(ContactMessage).where(ContactMessage.email == email)).all()
+        return list(rows)
 
     @staticmethod
     def delete_message(database: Session, message_id: int) -> None:
         """Delete contact message by ID."""
-        message = database.scalar(
-            select(ContactMessage).where(ContactMessage.id == message_id)
-        )
+        message = database.scalar(select(ContactMessage).where(ContactMessage.id == message_id))
         if message:
             database.delete(message)
             database.commit()
-
-            

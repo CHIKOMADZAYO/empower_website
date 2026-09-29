@@ -1,13 +1,13 @@
 """Story routes."""
+
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.schemas.story import StoryCreate, StoryResponse
 from app.services.story_service import StoryService
-
 
 router = APIRouter(prefix="/stories", tags=["stories"])
 
@@ -30,6 +30,7 @@ async def get_story(
     story = StoryService.get_story_by_id(database, story_id)
     if not story:
         from fastapi import HTTPException
+
         raise HTTPException(status_code=404, detail="Story not found")
     return StoryResponse.model_validate(story)
 
@@ -45,12 +46,14 @@ async def create_story(
 
 
 @router.delete("/{story_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_story( 
+async def delete_story(
     story_id: int,
     database: Annotated[Session, Depends(get_db)],
 ) -> None:
     """Delete community story by ID."""
-    StoryService.delete_story(database, story_id)
+    result = StoryService.delete_story(database, story_id)
+    if result.get("status_code") == 404:
+        raise HTTPException(status_code=404, detail="Story not found")
 
 
 @router.put("/{story_id}", response_model=StoryResponse)
@@ -64,4 +67,3 @@ async def update_story(
     if not updated_story:
         raise HTTPException(status_code=404, detail="Story not found")
     return StoryResponse.model_validate(updated_story)
-

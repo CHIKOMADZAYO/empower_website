@@ -1,4 +1,5 @@
 """User management routes."""
+
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -9,7 +10,6 @@ from app.core.security import require_roles
 from app.models.user import User
 from app.schemas.user import UserListResponse
 from app.services.user_service import UserService
-
 
 router = APIRouter(prefix="/users", tags=["users"])
 

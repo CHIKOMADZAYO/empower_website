@@ -1,4 +1,5 @@
 """Authentication routes."""
+
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -10,7 +11,6 @@ from app.models.user import User
 from app.schemas.auth import LoginRequest, SignupRequest, TokenResponse
 from app.services.auth_service import AuthService
 
-
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
@@ -20,11 +20,7 @@ async def login(
     database: Annotated[Session, Depends(get_db)],
 ) -> TokenResponse:
     """Authenticate user and return access token."""
-    user = AuthService.authenticate_user(
-        database,
-        credentials.username,
-        credentials.password
-    )
+    user = AuthService.authenticate_user(database, credentials.username, credentials.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -59,5 +55,3 @@ async def get_profile(
         "message": f"Authenticated as {current_user.username}",
         "user": public_user(current_user),
     }
-
-

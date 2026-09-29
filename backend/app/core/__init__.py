@@ -1,4 +1,5 @@
 """Core module - configuration, security, database."""
+
 from app.core.config import Settings, get_settings
 from app.core.database import Base, engine, get_db, init_db
 from app.core.security import (

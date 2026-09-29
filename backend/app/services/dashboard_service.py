@@ -1,5 +1,9 @@
 """Dashboard service - aggregated read models for dashboards."""
-from sqlalchemy import func, select
+
+from collections.abc import Sequence
+from typing import Any
+
+from sqlalchemy import Row, func, select
 from sqlalchemy.orm import Session
 
 from app.models.contact import ContactMessage
@@ -8,10 +12,10 @@ from app.models.story import Story
 from app.models.user import User
 
 
-def _count_by_field(rows: list[tuple[str | None, int]]) -> dict[str, int]:
+def _count_by_field(rows: Sequence[Row[tuple[Any, int]]]) -> dict[str, int]:
     result: dict[str, int] = {}
     for key, count in rows:
-        result[key or "Uncategorised"] = int(count)
+        result[str(key) if key else "Uncategorised"] = int(count)
     return result
 
 
@@ -29,14 +33,24 @@ class DashboardService:
             list(database.execute(select(User.role, func.count(User.id)).group_by(User.role)).all())
         )
         projects_by_category = _count_by_field(
-            list(database.execute(select(Project.category, func.count(Project.id)).group_by(Project.category)).all())
+            list(
+                database.execute(
+                    select(Project.category, func.count(Project.id)).group_by(Project.category)
+                ).all()
+            )
         )
         stories_by_category = _count_by_field(
-            list(database.execute(select(Story.category, func.count(Story.id)).group_by(Story.category)).all())
+            list(
+                database.execute(
+                    select(Story.category, func.count(Story.id)).group_by(Story.category)
+                ).all()
+            )
         )
 
         recent_users = database.scalars(select(User).order_by(User.id.desc()).limit(5)).all()
-        recent_projects = database.scalars(select(Project).order_by(Project.id.desc()).limit(5)).all()
+        recent_projects = database.scalars(
+            select(Project).order_by(Project.id.desc()).limit(5)
+        ).all()
         recent_stories = database.scalars(select(Story).order_by(Story.id.desc()).limit(5)).all()
         recent_messages = database.scalars(
             select(ContactMessage).order_by(ContactMessage.created_at.desc()).limit(5)
@@ -51,14 +65,16 @@ class DashboardService:
             "projects_by_category": projects_by_category,
             "stories_by_category": stories_by_category,
             "recent_users": [
-                {"id": u.id, "username": u.username, "email": u.email, "role": u.role} for u in recent_users
+                {"id": u.id, "username": u.username, "email": u.email, "role": u.role}
+                for u in recent_users
             ],
             "recent_projects": [
                 {"id": p.id, "name": p.name, "category": p.category, "summary": p.summary}
                 for p in recent_projects
             ],
             "recent_stories": [
-                {"id": s.id, "title": s.title, "category": s.category, "year": s.year} for s in recent_stories
+                {"id": s.id, "title": s.title, "category": s.category, "year": s.year}
+                for s in recent_stories
             ],
             "recent_messages": [
                 {
@@ -77,15 +93,15 @@ class DashboardService:
         total_projects = database.scalar(select(func.count(Project.id))) or 0
         total_stories = database.scalar(select(func.count(Story.id))) or 0
 
-        my_messages = (
-            database.scalars(
-                select(ContactMessage)
-                .where(ContactMessage.email == user.email)
-                .order_by(ContactMessage.created_at.desc())
-                .limit(10)
-            ).all()
-        )
-        latest_projects = database.scalars(select(Project).order_by(Project.id.desc()).limit(6)).all()
+        my_messages = database.scalars(
+            select(ContactMessage)
+            .where(ContactMessage.email == user.email)
+            .order_by(ContactMessage.created_at.desc())
+            .limit(10)
+        ).all()
+        latest_projects = database.scalars(
+            select(Project).order_by(Project.id.desc()).limit(6)
+        ).all()
         latest_stories = database.scalars(select(Story).order_by(Story.id.desc()).limit(6)).all()
 
         return {

@@ -1,4 +1,5 @@
 """Project routes."""
+
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
@@ -7,7 +8,6 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.project import ProjectCreate, ProjectResponse
 from app.services.project_service import ProjectService
-
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
@@ -30,6 +30,7 @@ async def get_project(
     project = ProjectService.get_project_by_id(database, project_id)
     if not project:
         from fastapi import HTTPException
+
         raise HTTPException(status_code=404, detail="Project not found")
     return ProjectResponse.model_validate(project)
 
@@ -43,6 +44,7 @@ async def create_project(
     new_project = ProjectService.create_project(database, project)
     return ProjectResponse.model_validate(new_project)
 
+
 @router.put("/{project_id}", response_model=ProjectResponse)
 async def update_project(
     project_id: int,
@@ -53,6 +55,7 @@ async def update_project(
     updated_project = ProjectService.update_project(database, project_id, project)
     if not updated_project:
         from fastapi import HTTPException
+
         raise HTTPException(status_code=404, detail="Project not found")
     return ProjectResponse.model_validate(updated_project)
 
@@ -64,5 +67,3 @@ async def delete_project(
 ) -> None:
     """Delete project by ID."""
     ProjectService.delete_project(database, project_id)
-
-

@@ -12,10 +12,7 @@ fastapi==0.141.1
 greenlet==3.5.5
 h11==0.16.0
 httpcore==1.0.9
-httpcore2==2.12.0
-httptools==0.8.0
 httpx==0.28.1
-httpx2==2.12.0
 idna==3.19
 iniconfig==2.3.0
 packaging==26.3
@@ -31,6 +28,11 @@ pytest-cov>=4.1,<7.0
 python-dotenv==1.2.3
 PyYAML==6.0.3
 SQLAlchemy==2.0.52
+alembic>=1.13
+psycopg[binary]>=3.1
+redis>=5.0
+ruff>=0.5
+mypy>=1.10
 starlette==1.6.0
 truststore==0.10.4
 typing-inspection==0.4.4
@@ -39,3 +41,4 @@ uvicorn==0.52.4
 uvloop==0.22.1
 watchfiles==1.2.0
 websockets>=13.0
+

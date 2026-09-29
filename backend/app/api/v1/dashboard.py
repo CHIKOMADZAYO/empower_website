@@ -1,4 +1,5 @@
 """Dashboard routes - aggregated summaries for admin and normal users."""
+
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -9,7 +10,6 @@ from app.core.security import get_current_user, require_roles
 from app.models.user import User
 from app.schemas.dashboard import AdminSummaryResponse, UserSummaryResponse
 from app.services.dashboard_service import DashboardService
-
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 

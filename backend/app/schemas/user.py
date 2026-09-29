@@ -1,15 +1,18 @@
 """User schemas - request/response models."""
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserBase(BaseModel):
     """Base user schema."""
+
     username: str = Field(min_length=2, max_length=100)
     role: str
 
 
 class UserResponse(UserBase):
     """User response schema."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -17,16 +20,19 @@ class UserResponse(UserBase):
 
 class UserListResponse(BaseModel):
     """User list response schema (admin only, includes email)."""
+
     model_config = ConfigDict(from_attributes=True)
 
     id: int
     username: str
     email: str
     role: str
-    
+
+
 class UserUpdate(BaseModel):
     """Updating Users Will be  done by the Admin"""
-    id:int
-    username:str
-    email:str
-    role:str
+
+    id: int
+    username: str
+    email: str
+    role: str

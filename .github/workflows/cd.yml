@@ -1,0 +1,74 @@
+name: CD
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        default: staging
+        type: choice
+        options: [staging, production]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install automation deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      # Secrets management: store these in GitHub Actions Secrets
+      # (repo Settings -> Secrets and variables -> Actions):
+      #   DATABASE_URL, SECRET_KEY, REDIS_URL, POSTGRES_PASSWORD,
+      #   RABBITMQ_PASSWORD, DEPLOY_HOST/SSH key or cloud credentials.
+      # Never echo secrets; the automation logger redacts them automatically.
+      - name: Validate production config
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          ENVIRONMENT: production
+        run: python automation.py security --strict
+
+      - name: Log in to GHCR
+        if: github.event_name != 'workflow_dispatch'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: ${{ github.event_name != 'workflow_dispatch' }}
+          tags: ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+
+      - name: Deploy (example: compose over SSH)
+        run: |
+          echo "Add your deploy step here (SSH, Kamal, Fly, Render, Azure...)."
+          echo "After deploy, verify: python automation.py health --url https://<host>/api/v1/health"
+
+      - name: Post-deploy health check
+        env:
+          HEALTH_URL: ${{ secrets.HEALTH_URL }}
+        run: |
+          if [ -n "$HEALTH_URL" ]; then python automation.py health --url "$HEALTH_URL"; else echo "HEALTH_URL secret not set — skipping live check."; fi

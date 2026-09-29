@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: empower-check
+        name: empower pre-commit checks
+        entry: python automation.py check
+        language: system
+        pass_filenames: false
+        always_run: true

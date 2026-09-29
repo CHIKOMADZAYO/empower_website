@@ -1,4 +1,5 @@
 """Test configuration and fixtures."""
+
 import sys
 from pathlib import Path
 
@@ -6,11 +7,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
-from sqlalchemy.orm import Session
+from fastapi.testclient import TestClient
 
 from app.core.database import Base, SessionLocal, engine
 from app.main import create_app
-from fastapi.testclient import TestClient
 
 
 @pytest.fixture(scope="function", autouse=True)

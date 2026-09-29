@@ -1,5 +1,6 @@
 """Integration tests for public and protected API endpoints."""
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.core.database import SessionLocal
@@ -7,6 +8,8 @@ from app.core.security import create_access_token, hash_password
 from app.models.project import Project
 from app.models.story import Story
 from app.models.user import User
+
+pytestmark = pytest.mark.integration
 
 
 def test_public_health_endpoints(client: TestClient) -> None:

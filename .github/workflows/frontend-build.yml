@@ -27,14 +27,10 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        run: |
-          cd frontend
-          npm install
+        run: npm ci --prefix frontend
 
       - name: Build
-        run: |
-          cd frontend
-          npm run build
+        run: npm run build --prefix frontend
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

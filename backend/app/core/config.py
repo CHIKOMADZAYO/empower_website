@@ -1,4 +1,5 @@
 """Application configuration and environment variables."""
+
 import os
 from functools import lru_cache
 from pathlib import Path
@@ -9,8 +10,7 @@ class Settings:
 
     # Database
     DATABASE_URL: str = os.getenv(
-        "DATABASE_URL",
-        f"sqlite:///{Path(__file__).resolve().parents[2] / 'empower.db'}"
+        "DATABASE_URL", f"sqlite:///{Path(__file__).resolve().parents[2] / 'empower.db'}"
     )
 
     # Security Settings
@@ -31,7 +31,7 @@ class Settings:
     CORS_ALLOW_HEADERS: list[str] = ["*"]
 
 
-@lru_cache()
+@lru_cache
 def get_settings() -> Settings:
     """Get cached application settings."""
     return Settings()

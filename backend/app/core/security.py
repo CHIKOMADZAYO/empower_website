@@ -1,5 +1,6 @@
 """Security utilities: authentication, password hashing, JWT tokens."""
-from datetime import datetime, timedelta, timezone
+
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 import jwt
@@ -13,7 +14,6 @@ from app.core.config import get_settings
 from app.core.database import get_db
 from app.models.user import User
 from app.schemas.user import UserResponse
-
 
 password_hash = PasswordHash.recommended()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
@@ -32,13 +32,8 @@ def verify_password(password: str, hashed_password: str) -> bool:
 def create_access_token(user: User) -> str:
     """Create JWT access token for user."""
     settings = get_settings()
-    expires_at = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    payload = {
-        "sub": str(user.id),
-        "username": user.username,
-        "role": user.role,
-        "exp": expires_at
-    }
+    expires_at = datetime.now(UTC) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {"sub": str(user.id), "username": user.username, "role": user.role, "exp": expires_at}
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
@@ -59,9 +54,7 @@ def get_current_user(
     except (ValueError, TypeError, jwt.InvalidTokenError) as error:
         raise credentials_error from error
 
-    user = database.scalar(
-        select(User).where(User.id == user_id, User.is_active.is_(True))
-    )
+    user = database.scalar(select(User).where(User.id == user_id, User.is_active.is_(True)))
     if user is None:
         raise credentials_error
     return user
@@ -69,15 +62,15 @@ def get_current_user(
 
 def require_roles(*allowed_roles: str):
     """Dependency to require specific user roles."""
-    def role_dependency(
-        user: Annotated[User, Depends(get_current_user)]
-    ) -> User:
+
+    def role_dependency(user: Annotated[User, Depends(get_current_user)]) -> User:
         if user.role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not have permission to perform this action.",
             )
         return user
+
     return role_dependency
 
 

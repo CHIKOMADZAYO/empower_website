@@ -1,20 +1,71 @@
-version: '3.8'
-
 services:
   backend:
-    build: ./backend
+    build: .
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=sqlite:///./data/empower.db
-      - SECRET_KEY=your-secret-key-change-in-production
-      - DEBUG=true
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://empower:empower_password@postgres:5432/empower}
+      SECRET_KEY: ${SECRET_KEY:-development-only-change-me}
+      EMPOWER_SECRET_KEY: ${SECRET_KEY:-development-only-change-me}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DEBUG: ${DEBUG:-false}
     volumes:
-      - ./backend:/app
       - ./backend/data:/app/data
-    command: python app/main.py
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health', timeout=4).read()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-empower}
+      POSTGRES_USER: ${POSTGRES_USER:-empower}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-empower_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-empower}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-empower}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-empower_password}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    profiles: ["queue"]
 
   frontend:
     build: ./frontend
@@ -26,17 +77,11 @@ services:
     command: npm run dev
     environment:
       - VITE_API_URL=http://localhost:8000/api/v1
-
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      - POSTGRES_DB=empower
-      - POSTGRES_USER=empower
-      - POSTGRES_PASSWORD=empower_password
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    depends_on:
+      - backend
+    profiles: ["frontend"]
 
 volumes:
   postgres_data:
+  redis_data:
+  rabbitmq_data:
