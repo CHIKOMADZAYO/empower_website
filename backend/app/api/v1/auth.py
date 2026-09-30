@@ -18,7 +18,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login", response_model=TokenResponse, status_code=status.HTTP_200_OK)
 async def login(
-    request:Request,
+    request: Request,
     credentials: LoginRequest,
     database: Annotated[Session, Depends(get_db)],
 ) -> TokenResponse:
@@ -29,7 +29,7 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid username or password",
         )
-    
+
     await record_activity(
         database,
         user_id=user.id,
@@ -39,13 +39,13 @@ async def login(
         ip_address=request.client.host,
         user_agent=request.headers.get("user-agent"),
     )
-    
+
     return AuthService.get_token_response(user)
 
 
 @router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def signup(
-    required:Request,
+    required: Request,
     request: SignupRequest,
     database: Annotated[Session, Depends(get_db)],
 ) -> TokenResponse:
@@ -57,8 +57,7 @@ async def signup(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(error),
         ) from error
-        
-        
+
     await record_activity(
         database,
         user_id=user.id,

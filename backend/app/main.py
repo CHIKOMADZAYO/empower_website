@@ -17,8 +17,6 @@ settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
-
-
 def seed_database() -> None:
     """Seed database with local demo data when the database is empty."""
     from sqlalchemy import select
@@ -119,8 +117,7 @@ def create_app() -> FastAPI:
         allow_methods=settings.CORS_ALLOW_METHODS,
         allow_headers=settings.CORS_ALLOW_HEADERS,
     )
-    
-    
+
     app.middleware("http")(request_logging_middleware)
 
     # Include routers

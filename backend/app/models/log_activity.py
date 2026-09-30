@@ -7,7 +7,6 @@ from app.core.database import Base
 
 
 class ActivityLog(Base):
-
     __tablename__ = "activity_logs"
 
     id: Mapped[int] = mapped_column(

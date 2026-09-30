@@ -21,7 +21,7 @@ router = APIRouter(prefix="/contact", tags=["contact"])
 
 @router.post("", response_model=ContactMessageResponse, status_code=status.HTTP_201_CREATED)
 async def create_contact_message(
-    request:Request,
+    request: Request,
     contact_data: ContactMessageCreate,
     database: Annotated[Session, Depends(get_db)],
 ) -> ContactMessageResponse:
@@ -40,13 +40,13 @@ async def create_contact_message(
 
 @router.get("", response_model=list[ContactMessageListResponse])
 async def list_contact_messages(
-    request:Request,
+    request: Request,
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles("admin"))],
 ) -> list[ContactMessageListResponse]:
     """Get all contact messages (admin only)."""
     messages = ContactService.get_all_messages(database)
-    
+
     await record_activity(
         database,
         user_id=User.id,
