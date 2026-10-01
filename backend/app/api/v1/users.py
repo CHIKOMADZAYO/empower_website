@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.roles import UserRole
 from app.core.security import require_roles
 from app.models.user import User
 from app.schemas.user import UserListResponse
@@ -17,7 +18,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.get("", response_model=list[UserListResponse])
 async def list_users(
     database: Annotated[Session, Depends(get_db)],
-    _: Annotated[User, Depends(require_roles("admin"))],
+    _: Annotated[User, Depends(require_roles(UserRole.ADMIN))],
 ) -> list[UserListResponse]:
     """Get all users (admin only)."""
     users = UserService.get_all_users(database)

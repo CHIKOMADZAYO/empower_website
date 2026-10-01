@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.roles import UserRole
 from app.core.security import get_current_user, require_roles
 from app.models.user import User
 from app.schemas.dashboard import AdminSummaryResponse, UserSummaryResponse
@@ -17,7 +18,7 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 @router.get("/admin", response_model=AdminSummaryResponse)
 async def admin_dashboard(
     database: Annotated[Session, Depends(get_db)],
-    _: Annotated[User, Depends(require_roles("admin"))],
+    _: Annotated[User, Depends(require_roles(UserRole.ADMIN))],
 ) -> AdminSummaryResponse:
     """Get aggregated stats for the admin dashboard (admin only)."""
     summary = DashboardService.admin_summary(database)

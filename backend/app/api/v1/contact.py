@@ -2,11 +2,11 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status, Request
+from fastapi import APIRouter, Depends, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.services.logs_service import record_activity
+from app.core.roles import UserRole
 from app.core.security import require_roles
 from app.models.user import User
 from app.schemas.contact import (
@@ -15,6 +15,7 @@ from app.schemas.contact import (
     ContactMessageResponse,
 )
 from app.services.contact_service import ContactService
+from app.services.logs_service import record_activity
 
 router = APIRouter(prefix="/contact", tags=["contact"])
 
@@ -32,7 +33,7 @@ async def create_contact_message(
         user_id=None,
         action="USER SENT A MESSAGE",
         resource="contact_message",
-        ip_address=request.client.host,
+        ip_address=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent"),
     )
     return response
@@ -42,7 +43,7 @@ async def create_contact_message(
 async def list_contact_messages(
     request: Request,
     database: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[User, Depends(require_roles("admin"))],
+    current_user: Annotated[User, Depends(require_roles(UserRole.ADMIN))],
 ) -> list[ContactMessageListResponse]:
     """Get all contact messages (admin only)."""
     messages = ContactService.get_all_messages(database)
@@ -52,7 +53,7 @@ async def list_contact_messages(
         user_id=current_user.id,
         action="ADMIN LISTS ALL MESSAGE",
         resource="contact_message",
-        ip_address=request.client.host,
+        ip_address=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent"),
     )
     return [ContactMessageListResponse.model_validate(m) for m in messages]
@@ -62,7 +63,7 @@ async def list_contact_messages(
 async def get_contact_message(
     message_id: int,
     database: Annotated[Session, Depends(get_db)],
-    _: Annotated[User, Depends(require_roles("admin"))],
+    _: Annotated[User, Depends(require_roles(UserRole.ADMIN))],
 ) -> ContactMessageListResponse:
     """Get contact message by ID (admin only)."""
     message = ContactService.get_message_by_id(database, message_id)
@@ -77,7 +78,7 @@ async def get_contact_message(
 async def delete_contact_message(
     message_id: int,
     database: Annotated[Session, Depends(get_db)],
-    _: Annotated[User, Depends(require_roles("admin"))],
+    _: Annotated[User, Depends(require_roles(UserRole.ADMIN))],
 ):
     """Delete contact message by ID (admin only)."""
     ContactService.delete_message(database, message_id)

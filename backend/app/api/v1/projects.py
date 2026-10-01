@@ -6,6 +6,9 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.roles import UserRole
+from app.core.security import require_roles
+from app.models.user import User
 from app.schemas.project import ProjectCreate, ProjectResponse
 from app.services.project_service import ProjectService
 
@@ -39,6 +42,7 @@ async def get_project(
 async def create_project(
     project: ProjectCreate,
     database: Annotated[Session, Depends(get_db)],
+    _: Annotated[User, Depends(require_roles(UserRole.ADMIN, UserRole.EDITOR))],
 ) -> ProjectResponse:
     """Create new project."""
     new_project = ProjectService.create_project(database, project)
@@ -50,6 +54,7 @@ async def update_project(
     project_id: int,
     project: ProjectCreate,
     database: Annotated[Session, Depends(get_db)],
+    _: Annotated[User, Depends(require_roles(UserRole.ADMIN, UserRole.EDITOR))],
 ) -> ProjectResponse:
     """Update project by ID."""
     updated_project = ProjectService.update_project(database, project_id, project)
@@ -64,6 +69,7 @@ async def update_project(
 async def delete_project(
     project_id: int,
     database: Annotated[Session, Depends(get_db)],
+    _: Annotated[User, Depends(require_roles(UserRole.ADMIN, UserRole.EDITOR))],
 ) -> None:
     """Delete project by ID."""
     ProjectService.delete_project(database, project_id)

@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.database import get_db
+from app.core.roles import UserRole
 from app.models.user import User
 from app.schemas.user import UserResponse
 
@@ -60,7 +61,7 @@ def get_current_user(
     return user
 
 
-def require_roles(*allowed_roles: str):
+def require_roles(*allowed_roles: UserRole):
     """Dependency to require specific user roles."""
 
     def role_dependency(user: Annotated[User, Depends(get_current_user)]) -> User:

@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
+
+import sqlalchemy as sa
 
 from alembic import op
-import sqlalchemy as sa
 
 revision: str = "b7f3a8d9210c"
 down_revision: str | None = "18032a19fe31"

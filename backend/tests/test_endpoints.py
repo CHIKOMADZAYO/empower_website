@@ -4,6 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.core.database import SessionLocal
+from app.core.roles import UserRole
 from app.core.security import create_access_token, hash_password
 from app.models.log_activity import ActivityLog
 from app.models.project import Project
@@ -11,6 +12,21 @@ from app.models.story import Story
 from app.models.user import User
 
 pytestmark = pytest.mark.integration
+
+
+def _auth_headers(username: str, role: UserRole) -> dict[str, str]:
+    with SessionLocal() as db:
+        user = User(
+            username=username,
+            email=f"{username}@example.com",
+            hashed_password=hash_password("StrongPass123"),
+            role=role,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        token = create_access_token(user)
+    return {"Authorization": f"Bearer {token}"}
 
 
 def test_public_health_endpoints(client: TestClient) -> None:
@@ -25,7 +41,7 @@ def test_public_health_endpoints(client: TestClient) -> None:
 
 
 def test_projects_endpoints(client: TestClient) -> None:
-    """Projects should list, return details, and allow creation."""
+    """Project reads are public and editors can manage projects."""
     with SessionLocal() as db:
         db.add(
             Project(
@@ -56,15 +72,25 @@ def test_projects_endpoints(client: TestClient) -> None:
         "summary": "Support the next generation of community leaders.",
         "description": "A six-month mentoring programme helping young people build confidence, advocacy, and practical skills for local leadership roles.",
     }
-    create_response = client.post("/api/v1/projects", json=payload)
+    headers = _auth_headers("project_editor", UserRole.EDITOR)
+    create_response = client.post("/api/v1/projects", json=payload, headers=headers)
     assert create_response.status_code == 201, create_response.text
     created = create_response.json()
     assert created["name"] == payload["name"]
     assert created["category"] == payload["category"]
 
+    update_response = client.put(
+        f"/api/v1/projects/{created['id']}",
+        json=payload,
+        headers=headers,
+    )
+    assert update_response.status_code == 200, update_response.text
+    delete_response = client.delete(f"/api/v1/projects/{created['id']}", headers=headers)
+    assert delete_response.status_code == 204, delete_response.text
+
 
 def test_stories_endpoints(client: TestClient) -> None:
-    """Stories should list, return details, and allow creation."""
+    """Story reads are public and editors can manage stories."""
     with SessionLocal() as db:
         db.add(
             Story(
@@ -95,11 +121,84 @@ def test_stories_endpoints(client: TestClient) -> None:
         "excerpt": "A small plot of land became a place where families learned, shared food, and built stronger neighbourhood ties.",
         "year": 2024,
     }
-    create_response = client.post("/api/v1/stories", json=payload)
+    headers = _auth_headers("story_editor", UserRole.EDITOR)
+    create_response = client.post("/api/v1/stories", json=payload, headers=headers)
     assert create_response.status_code == 201, create_response.text
     created = create_response.json()
     assert created["title"] == payload["title"]
     assert created["category"] == payload["category"]
+
+    update_response = client.put(
+        f"/api/v1/stories/{created['id']}",
+        json=payload,
+        headers=headers,
+    )
+    assert update_response.status_code == 200, update_response.text
+    delete_response = client.delete(f"/api/v1/stories/{created['id']}", headers=headers)
+    assert delete_response.status_code == 204, delete_response.text
+
+
+@pytest.mark.parametrize(
+    ("method", "path", "payload"),
+    [
+        (
+            "post",
+            "/api/v1/projects",
+            {
+                "name": "Youth Leadership",
+                "category": "Education",
+                "summary": "Support the next generation of community leaders.",
+                "description": "A mentoring programme helping young people build leadership skills.",
+            },
+        ),
+        (
+            "put",
+            "/api/v1/projects/1",
+            {
+                "name": "Youth Leadership",
+                "category": "Education",
+                "summary": "Support the next generation of community leaders.",
+                "description": "A mentoring programme helping young people build leadership skills.",
+            },
+        ),
+        ("delete", "/api/v1/projects/1", None),
+        (
+            "post",
+            "/api/v1/stories",
+            {
+                "title": "Our community garden grew into a learning hub.",
+                "category": "Wellbeing",
+                "excerpt": "Families learned, shared food, and built stronger neighbourhood ties.",
+                "year": 2024,
+            },
+        ),
+        (
+            "put",
+            "/api/v1/stories/1",
+            {
+                "title": "Our community garden grew into a learning hub.",
+                "category": "Wellbeing",
+                "excerpt": "Families learned, shared food, and built stronger neighbourhood ties.",
+                "year": 2024,
+            },
+        ),
+        ("delete", "/api/v1/stories/1", None),
+    ],
+)
+def test_content_mutations_reject_anonymous_and_viewer(
+    client: TestClient,
+    method: str,
+    path: str,
+    payload: dict | None,
+) -> None:
+    """Content mutations require editor or admin privileges."""
+    viewer_headers = _auth_headers("content_viewer", UserRole.VIEWER)
+
+    anonymous_response = client.request(method, path, json=payload)
+    assert anonymous_response.status_code == 401, anonymous_response.text
+
+    viewer_response = client.request(method, path, json=payload, headers=viewer_headers)
+    assert viewer_response.status_code == 403, viewer_response.text
 
 
 def test_contact_endpoints(client: TestClient) -> None:
@@ -141,11 +240,7 @@ def test_contact_endpoints(client: TestClient) -> None:
     assert any(item["email"] == payload["email"] for item in messages)
 
     with SessionLocal() as db:
-        activity = (
-            db.query(ActivityLog)
-            .filter_by(action="ADMIN LISTS ALL MESSAGE")
-            .one()
-        )
+        activity = db.query(ActivityLog).filter_by(action="ADMIN LISTS ALL MESSAGE").one()
         assert activity.user_id == admin_id
         assert activity.resource == "contact_message"
 

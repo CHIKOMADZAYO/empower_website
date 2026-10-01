@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -11,7 +11,6 @@ from app.models.user import User
 from app.schemas.auth import LoginRequest, SignupRequest, TokenResponse
 from app.services.auth_service import AuthService
 from app.services.logs_service import record_activity
-
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -36,7 +35,7 @@ async def login(
         action="USER_LOGINS",
         resource="user",
         resource_id=str(user.id),
-        ip_address=request.client.host,
+        ip_address=request.client.host if request.client else None,
         user_agent=request.headers.get("user-agent"),
     )
 
@@ -65,7 +64,7 @@ async def signup(
         action="USER_SIGNUPS",
         resource="user",
         resource_id=str(user.id),
-        ip_address=required.client.host,
+        ip_address=required.client.host if required.client else None,
         user_agent=required.headers.get("user-agent"),
     )
 

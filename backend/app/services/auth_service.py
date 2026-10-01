@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.security import create_access_token, hash_password, verify_password
+from app.core.roles import UserRole
 from app.models.user import User
 from app.schemas.auth import SignupRequest, TokenResponse
 
@@ -15,7 +16,11 @@ class AuthService:
     def authenticate_user(database: Session, username: str, password: str) -> User | None:
         """Authenticate user with username and password."""
         user = database.scalar(select(User).where(User.username == username))
-        if not user or not verify_password(password, user.hashed_password):
+        if (
+            not user
+            or not user.is_active
+            or not verify_password(password, user.hashed_password)
+        ):
             return None
         return user
 
@@ -36,7 +41,7 @@ class AuthService:
             username=signup_request.username,
             email=signup_request.email,
             hashed_password=hash_password(signup_request.password),
-            role="viewer",
+            role=UserRole.VIEWER,
         )
         database.add(user)
         database.commit()

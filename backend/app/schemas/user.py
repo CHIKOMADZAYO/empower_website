@@ -2,12 +2,14 @@
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.core.roles import UserRole
+
 
 class UserBase(BaseModel):
     """Base user schema."""
 
     username: str = Field(min_length=2, max_length=100)
-    role: str
+    role: UserRole
 
 
 class UserResponse(UserBase):
@@ -26,7 +28,7 @@ class UserListResponse(BaseModel):
     id: int
     username: str
     email: str
-    role: str
+    role: UserRole
 
 
 class UserUpdate(BaseModel):
@@ -35,4 +37,4 @@ class UserUpdate(BaseModel):
     id: int
     username: str
     email: str
-    role: str
+    role: UserRole
