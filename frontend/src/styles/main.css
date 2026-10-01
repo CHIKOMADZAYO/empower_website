@@ -1036,12 +1036,108 @@ body:has(.story-list) .page-hero::before {
     justify-self: stretch;
     padding: 1.2rem;
   }
-  body:has(.donation-section) .footer-inner {
-    grid-template-columns: 1fr;
-  }
 }
 @media (max-width: 380px) {
   .tier-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+.footer-inner {
+  grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
+}
+.footer-about p {
+  max-width: 22rem;
+}
+.footer-column {
+  min-width: 0;
+}
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+.footer-bottom-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 1rem;
+  color: #b9d2c3;
+  font-size: 0.8rem;
+}
+.footer-bottom-inner > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+}
+.footer-bottom-inner a {
+  color: inherit;
+}
+.footer-bottom-inner a:hover {
+  color: #fff;
+}
+
+@media (max-width: 1024px) {
+  .footer-inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+}
+@media (max-width: 768px) {
+  .footer-inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4rem;
+    padding-top: 2.5rem;
+    padding-bottom: 1.5rem;
+  }
+  .footer-column h2 {
+    margin-bottom: 0.65rem;
+  }
+  .footer-bottom-inner {
+    align-items: flex-start;
+  }
+}
+@media (max-width: 480px) {
+  .footer-inner {
+    padding-inline: 18px;
+  }
+  .footer-bottom-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .footer-bottom-inner > div {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-wrap: wrap;
+  }
+  .navbar .nav-toggle {
+    display: inline-flex;
+    flex: 0 0 44px;
+    margin-left: auto;
+  }
+  .navbar ul {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin-top: 0.6rem;
+    padding: 0.5rem;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--orange-500);
+    background: var(--paper);
+  }
+  .navbar.nav-open ul {
+    display: flex;
+  }
+  .navbar ul a {
+    padding: 0.85rem 1rem;
+  }
+  .navbar .nav-donate {
+    margin: 0.4rem 0 0;
+    text-align: center;
   }
 }

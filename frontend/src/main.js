@@ -47,7 +47,11 @@ function setupNavigation() {
   });
 
   menu.addEventListener('click', (e) => {
-    if (e.target.closest('a')) navigation.classList.remove('nav-open');
+    if (e.target.closest('a')) {
+      navigation.classList.remove('nav-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open navigation menu');
+    }
   });
 }
 
