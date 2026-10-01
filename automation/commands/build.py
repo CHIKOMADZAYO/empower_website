@@ -35,15 +35,14 @@ def _package(ctx: AppContext) -> None:
     if ctx.dry_run:
         ctx.log.info("[dry-run] would build package into dist/")
         return
-    if (root / "pyproject.toml").is_file():
-        res = _run(sys.executable, "-m", "build", "--outdir", "dist", cwd=root)
-        if res.ok:
-            ctx.log.info("Package built into dist/.")
-            return
-        ctx.log.warning("`python -m build` unavailable; writing marker instead.")
-    dist = root / "dist"
-    dist.mkdir(exist_ok=True)
-    (dist / "build-info.txt").write_text("build ok\n", encoding="utf-8")
+    if not (root / "pyproject.toml").is_file():
+        raise AutomationError("Cannot build package: pyproject.toml was not found.")
+    res = _run(sys.executable, "-m", "build", "--outdir", "dist", cwd=root)
+    if not res.ok:
+        raise AutomationError(
+            "Python package build failed.", hint=(res.stdout + res.stderr)[-2000:]
+        )
+    ctx.log.info("Package built into dist/.")
 
 
 def run(args: argparse.Namespace, ctx: AppContext) -> int:

@@ -14,7 +14,6 @@ FROM base AS runtime
 COPY --from=deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=deps /usr/local/bin /usr/local/bin
 COPY backend/ ./
-COPY alembic.ini ./alembic.ini
 # Non-root user (security: don't run as root)
 RUN useradd --create-home --uid 10001 appuser \
   && mkdir -p /app/data && chown -R appuser:appuser /app

@@ -30,7 +30,8 @@ def validate_environment(ctx: AppContext, *, strict_prod: bool = False) -> list[
     # Re-read live env (load_dotenv only filled missing values).
     env = {
         "DATABASE_URL": os.getenv("DATABASE_URL", settings.database_url),
-        "SECRET_KEY": os.getenv("SECRET_KEY", os.getenv("EMPOWER_SECRET_KEY", settings.secret_key)),
+        "SECRET_KEY": settings.secret_key
+        or os.getenv("SECRET_KEY", os.getenv("EMPOWER_SECRET_KEY", "")),
         "ENVIRONMENT": os.getenv("ENVIRONMENT", settings.environment),
         "REDIS_URL": os.getenv("REDIS_URL", settings.redis_url),
     }

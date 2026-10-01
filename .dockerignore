@@ -8,6 +8,14 @@ htmlcov/
 coverage.xml
 dist/
 .venv/
+**/.venv/
+**/node_modules/
+.git/
+.github/
+automation/
+docs/
+frontend/
+backend/tests/
 .env
 backend/empower.db
 backend/data/*.db

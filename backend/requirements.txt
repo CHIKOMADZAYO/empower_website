@@ -8,6 +8,7 @@ cffi==2.1.1
 click==8.5.0
 dnspython==2.8.0
 email-validator==2.3.0
+build>=1.2
 fastapi==0.141.1
 greenlet==3.5.5
 h11==0.16.0
@@ -21,9 +22,9 @@ pwdlib==0.3.1
 pycparser==3.0
 pydantic==2.13.5
 pydantic_core==2.46.5
-PyJWT==2.13.0
-pytest==7.4.4
-pytest-asyncio==0.23.8
+PyJWT==2.15.1
+pytest==9.0.3
+pytest-asyncio==1.4.0
 pytest-cov>=4.1,<7.0
 python-dotenv==1.2.3
 PyYAML==6.0.3
@@ -41,4 +42,3 @@ uvicorn==0.52.4
 uvloop==0.22.1
 watchfiles==1.2.0
 websockets>=13.0
-
