@@ -58,10 +58,11 @@ async def signup(
             detail=str(error),
         ) from error
 
+    # Record user signup activity
     await record_activity(
         database,
         user_id=user.id,
-        action="user_login",
+        action="USER_SIGNUPS",
         resource="user",
         resource_id=str(user.id),
         ip_address=required.client.host,
