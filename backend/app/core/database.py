@@ -21,7 +21,6 @@ SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expi
 
 class Base(DeclarativeBase):
     """Base class for all SQLAlchemy models."""
-
     pass
 
 

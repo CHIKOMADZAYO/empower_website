@@ -1,13 +1,14 @@
 import logging
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
+
 from app.models.log_activity import ActivityLog
 
 logger = logging.getLogger(__name__)
 
 
-async def record_activity(
-    session: AsyncSession,
+def record_activity(
+    session: Session,
     *,
     user_id: int | None,
     action: str,
@@ -15,7 +16,7 @@ async def record_activity(
     resource_id: str | None = None,
     ip_address: str | None = None,
     user_agent: str | None = None,
-):
+) -> ActivityLog:
     activity = ActivityLog(
         user_id=user_id,
         action=action,
@@ -26,6 +27,11 @@ async def record_activity(
     )
 
     session.add(activity)
+    try:
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
 
     logger.info(
         "User activity | user_id=%s action=%s resource=%s resource_id=%s",
@@ -34,3 +40,4 @@ async def record_activity(
         resource,
         resource_id,
     )
+    return activity

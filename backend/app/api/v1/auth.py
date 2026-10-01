@@ -30,7 +30,7 @@ async def login(
             detail="Invalid username or password",
         )
 
-    await record_activity(
+    record_activity(
         database,
         user_id=user.id,
         action="USER_LOGINS",
@@ -59,7 +59,7 @@ async def signup(
         ) from error
 
     # Record user signup activity
-    await record_activity(
+    record_activity(
         database,
         user_id=user.id,
         action="USER_SIGNUPS",

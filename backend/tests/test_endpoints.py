@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 
 from app.core.database import SessionLocal
 from app.core.security import create_access_token, hash_password
+from app.models.log_activity import ActivityLog
 from app.models.project import Project
 from app.models.story import Story
 from app.models.user import User
@@ -115,6 +116,11 @@ def test_contact_endpoints(client: TestClient) -> None:
     assert created["message"] == "Thank you. Your message has been received by the Empower team."
 
     with SessionLocal() as db:
+        activity = db.query(ActivityLog).filter_by(action="USER SENT A MESSAGE").one()
+        assert activity.user_id is None
+        assert activity.resource == "contact_message"
+
+    with SessionLocal() as db:
         admin = User(
             username="admin_contact_user",
             email="admin_contact@example.com",
@@ -124,6 +130,7 @@ def test_contact_endpoints(client: TestClient) -> None:
         db.add(admin)
         db.commit()
         db.refresh(admin)
+        admin_id = admin.id
         token = create_access_token(admin)
 
     headers = {"Authorization": f"Bearer {token}"}
@@ -132,6 +139,15 @@ def test_contact_endpoints(client: TestClient) -> None:
     assert list_response.status_code == 200, list_response.text
     messages = list_response.json()
     assert any(item["email"] == payload["email"] for item in messages)
+
+    with SessionLocal() as db:
+        activity = (
+            db.query(ActivityLog)
+            .filter_by(action="ADMIN LISTS ALL MESSAGE")
+            .one()
+        )
+        assert activity.user_id == admin_id
+        assert activity.resource == "contact_message"
 
     first_message = messages[0]
     detail_response = client.get(

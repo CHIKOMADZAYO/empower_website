@@ -2,6 +2,10 @@
 
 from fastapi.testclient import TestClient
 
+from app.core.database import SessionLocal
+from app.models.log_activity import ActivityLog
+from app.models.user import User
+
 
 def test_signup_creates_user_and_returns_token(client: TestClient) -> None:
     """Test user signup creates account and returns token."""
@@ -25,6 +29,17 @@ def test_signup_creates_user_and_returns_token(client: TestClient) -> None:
         json={"username": username, "password": password},
     )
     assert login_response.status_code == 200, login_response.text
+
+    with SessionLocal() as database:
+        user = database.query(User).filter(User.username == username).one()
+        actions = (
+            database.query(ActivityLog.action)
+            .filter(ActivityLog.user_id == user.id)
+            .order_by(ActivityLog.id)
+            .all()
+        )
+
+    assert [action for (action,) in actions] == ["USER_SIGNUPS", "USER_LOGINS"]
 
 
 def test_signup_with_existing_username_or_email_fails(client: TestClient) -> None:

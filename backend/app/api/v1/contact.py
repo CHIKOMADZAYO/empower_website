@@ -26,34 +26,32 @@ async def create_contact_message(
     database: Annotated[Session, Depends(get_db)],
 ) -> ContactMessageResponse:
     """Submit contact form message."""
-    # Record user activity for submitting a contact message
-    await record_activity(
+    response = ContactService.create_message(database, contact_data)
+    record_activity(
         database,
-        user_id=User.id,
+        user_id=None,
         action="USER SENT A MESSAGE",
-        resource="user",
-        resource_id=str(User.id),
+        resource="contact_message",
         ip_address=request.client.host,
         user_agent=request.headers.get("user-agent"),
     )
-    return ContactService.create_message(database, contact_data)
+    return response
 
 
 @router.get("", response_model=list[ContactMessageListResponse])
 async def list_contact_messages(
     request: Request,
     database: Annotated[Session, Depends(get_db)],
-    _: Annotated[User, Depends(require_roles("admin"))],
+    current_user: Annotated[User, Depends(require_roles("admin"))],
 ) -> list[ContactMessageListResponse]:
     """Get all contact messages (admin only)."""
     messages = ContactService.get_all_messages(database)
 
-    await record_activity(
+    record_activity(
         database,
-        user_id=User.id,
+        user_id=current_user.id,
         action="ADMIN LISTS ALL MESSAGE",
-        resource="user",
-        resource_id=str(User.id),
+        resource="contact_message",
         ip_address=request.client.host,
         user_agent=request.headers.get("user-agent"),
     )
