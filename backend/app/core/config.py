@@ -36,9 +36,8 @@ def get_settings() -> Settings:
     """Get cached application settings."""
     settings = Settings()
     secret_key = settings.SECRET_KEY
-    if (
-        len(secret_key.encode("utf-8")) < 32
-        or any(marker in secret_key.lower() for marker in ("change-me", "development-only"))
+    if len(secret_key.encode("utf-8")) < 32 or any(
+        marker in secret_key.lower() for marker in ("change-me", "development-only")
     ):
         raise ValueError("Set EMPOWER_SECRET_KEY or SECRET_KEY to at least 32 random characters.")
     return settings

@@ -16,11 +16,7 @@ class AuthService:
     def authenticate_user(database: Session, username: str, password: str) -> User | None:
         """Authenticate user with username and password."""
         user = database.scalar(select(User).where(User.username == username))
-        if (
-            not user
-            or not user.is_active
-            or not verify_password(password, user.hashed_password)
-        ):
+        if not user or not user.is_active or not verify_password(password, user.hashed_password):
             return None
         return user
 
