@@ -44,9 +44,11 @@ class ProjectService:
         return project
 
     @staticmethod
-    def delete_project(database: Session, project_id: int) -> None:
-        """Delete project by ID."""
+    def delete_project(database: Session, project_id: int) -> bool:
+        """Delete project by ID, returning whether it existed."""
         project = database.scalar(select(Project).where(Project.id == project_id))
-        if project:
-            database.delete(project)
-            database.commit()
+        if not project:
+            return False
+        database.delete(project)
+        database.commit()
+        return True

@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -32,8 +32,6 @@ async def get_project(
     """Get project by ID."""
     project = ProjectService.get_project_by_id(database, project_id)
     if not project:
-        from fastapi import HTTPException
-
         raise HTTPException(status_code=404, detail="Project not found")
     return ProjectResponse.model_validate(project)
 
@@ -59,8 +57,6 @@ async def update_project(
     """Update project by ID."""
     updated_project = ProjectService.update_project(database, project_id, project)
     if not updated_project:
-        from fastapi import HTTPException
-
         raise HTTPException(status_code=404, detail="Project not found")
     return ProjectResponse.model_validate(updated_project)
 
@@ -70,6 +66,8 @@ async def delete_project(
     project_id: int,
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles(UserRole.ADMIN, UserRole.EDITOR))],
-) -> None:
+) -> Response:
     """Delete project by ID."""
-    ProjectService.delete_project(database, project_id)
+    if not ProjectService.delete_project(database, project_id):
+        raise HTTPException(status_code=404, detail="Project not found")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

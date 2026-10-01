@@ -42,11 +42,11 @@ class StoryService:
         return story
 
     @staticmethod
-    def delete_story(database: Session, story_id: int) -> dict[str, object]:
-        """Delete story by ID."""
+    def delete_story(database: Session, story_id: int) -> bool:
+        """Delete story by ID, returning whether it existed."""
         story = database.scalar(select(Story).where(Story.id == story_id))
         if not story:
-            return {"message": "Story not found", "status_code": 404}
+            return False
         database.delete(story)
         database.commit()
-        return {"message": "Story deleted", "status_code": 200}
+        return True

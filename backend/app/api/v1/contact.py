@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -68,8 +68,6 @@ async def get_contact_message(
     """Get contact message by ID (admin only)."""
     message = ContactService.get_message_by_id(database, message_id)
     if not message:
-        from fastapi import HTTPException
-
         raise HTTPException(status_code=404, detail="Message not found")
     return ContactMessageListResponse.model_validate(message)
 
@@ -79,7 +77,8 @@ async def delete_contact_message(
     message_id: int,
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles(UserRole.ADMIN))],
-):
+) -> Response:
     """Delete contact message by ID (admin only)."""
-    ContactService.delete_message(database, message_id)
-    return {"message": f"Contact message with ID {message_id} has been deleted."}
+    if not ContactService.delete_message(database, message_id):
+        raise HTTPException(status_code=404, detail="Message not found")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

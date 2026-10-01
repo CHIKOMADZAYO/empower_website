@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -54,11 +54,11 @@ async def delete_story(
     story_id: int,
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles(UserRole.ADMIN, UserRole.EDITOR))],
-) -> None:
+) -> Response:
     """Delete community story by ID."""
-    result = StoryService.delete_story(database, story_id)
-    if result.get("status_code") == 404:
+    if not StoryService.delete_story(database, story_id):
         raise HTTPException(status_code=404, detail="Story not found")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.put("/{story_id}", response_model=StoryResponse)

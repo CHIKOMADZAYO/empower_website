@@ -50,9 +50,11 @@ class ContactService:
         return list(rows)
 
     @staticmethod
-    def delete_message(database: Session, message_id: int) -> None:
-        """Delete contact message by ID."""
+    def delete_message(database: Session, message_id: int) -> bool:
+        """Delete contact message by ID, returning whether it existed."""
         message = database.scalar(select(ContactMessage).where(ContactMessage.id == message_id))
-        if message:
-            database.delete(message)
-            database.commit()
+        if not message:
+            return False
+        database.delete(message)
+        database.commit()
+        return True
