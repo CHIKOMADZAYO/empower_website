@@ -752,3 +752,296 @@ body:has(.story-list) .page-hero::before {
     font-size: 1.8rem;
   }
 }
+
+/* Donation page */
+.donate-stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0 1.5rem;
+}
+.donate-stats .impact-card {
+  border-top-color: var(--orange-500);
+}
+.donate-stats .card-index,
+.engagement-card .card-index {
+  display: block;
+  margin-bottom: 1.2rem;
+  color: var(--orange-600);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+.donate-stats .impact-card h3 {
+  margin-bottom: 0.45rem;
+  color: var(--green-950);
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  line-height: 1;
+}
+.donate-stats .impact-card p,
+.trust-card p,
+.engagement-card p {
+  color: var(--muted);
+}
+
+.story-panel {
+  align-items: center;
+  gap: clamp(2rem, 6vw, 5rem);
+}
+.story-image img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  filter: saturate(0.78);
+}
+.story-copy {
+  max-width: 38rem;
+}
+.story-copy h2 {
+  margin: 0.7rem 0 1rem;
+  color: var(--green-950);
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  line-height: 1.08;
+}
+.story-copy p:not(.eyebrow) {
+  color: var(--muted);
+}
+
+.trust {
+  padding-block: 2.5rem 4rem;
+}
+.trust-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 2rem;
+}
+.trust-card > span {
+  display: block;
+  margin-bottom: 0.7rem;
+  color: var(--green-800);
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  line-height: 1;
+}
+.trust-card h3,
+.engagement-card h3 {
+  margin-bottom: 0.55rem;
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+.trust-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+.trust-badges .badge {
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+}
+
+.donation-section {
+  margin-block: 2rem 4rem;
+  padding-block: 3.5rem;
+  border-block: 1px solid var(--line);
+  background: var(--cream);
+}
+.donation-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(20rem, 1.1fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 5rem);
+}
+.donation-copy {
+  max-width: 31rem;
+}
+.donation-copy h2 {
+  margin: 0.8rem 0 1rem;
+  color: var(--green-950);
+  font-family: var(--font-display);
+  font-size: 2.7rem;
+  line-height: 1.05;
+}
+.donation-copy > p:not(.eyebrow) {
+  color: var(--muted);
+}
+.donation-benefits {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.4rem;
+  padding: 0;
+  list-style: none;
+}
+.donation-benefits li {
+  position: relative;
+  padding-left: 1.3rem;
+  color: var(--ink-soft);
+}
+.donation-benefits li::before {
+  position: absolute;
+  top: 0.7em;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  background: var(--orange-500);
+  content: "";
+}
+.donation-form {
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 35rem;
+  justify-self: end;
+  padding: 1.7rem;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--green-800);
+  background: #fff;
+}
+.donation-form label {
+  margin-top: 0.35rem;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+.donation-form input[type="number"],
+.donation-form input[type="tel"] {
+  min-height: 3rem;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: #fff;
+}
+.donation-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem;
+  margin-bottom: 0.35rem;
+  padding: 0.25rem;
+  border: 1px solid var(--line);
+  background: var(--paper);
+}
+.toggle-option {
+  min-height: 2.75rem;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.toggle-option.is-active {
+  border-color: var(--green-900);
+  background: var(--green-900);
+  color: #fff;
+}
+.tier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-block: 0.25rem 0.5rem;
+}
+.tier-button {
+  min-height: 3rem;
+  padding: 0.5rem 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: #fff;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: var(--transition);
+}
+.tier-button:hover {
+  border-color: var(--green-700);
+  background: var(--green-50);
+}
+.tier-button.is-selected {
+  border-color: var(--orange-600);
+  background: var(--orange-100);
+  color: var(--orange-600);
+}
+.donation-form > .button-primary {
+  width: 100%;
+  min-height: 3.25rem;
+  margin-top: 0.25rem;
+}
+.payment-methods {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.45rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--line-soft);
+}
+.payment-methods span {
+  padding: 0.25rem 0.45rem;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.engagement-grid {
+  gap: 0 2rem;
+}
+.engagement-card .text-link {
+  display: inline-flex;
+  margin-top: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .donate-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .donation-layout {
+    grid-template-columns: minmax(0, 0.8fr) minmax(18rem, 1.2fr);
+    gap: 2rem;
+  }
+  .donation-copy h2 {
+    font-size: 2.25rem;
+  }
+}
+@media (max-width: 680px) {
+  .donate-stats,
+  .trust-grid,
+  .engagement-grid,
+  .story-panel,
+  .donation-layout {
+    grid-template-columns: 1fr;
+  }
+  .donate-stats {
+    gap: 0;
+  }
+  .story-panel {
+    gap: 1.5rem;
+    padding-block: 2.5rem;
+  }
+  .story-copy h2,
+  .donation-copy h2 {
+    font-size: 2rem;
+  }
+  .donation-section {
+    margin-block: 1rem 2.5rem;
+    padding-block: 2.5rem;
+  }
+  .donation-layout {
+    gap: 1.5rem;
+  }
+  .donation-form {
+    max-width: none;
+    justify-self: stretch;
+    padding: 1.2rem;
+  }
+  body:has(.donation-section) .footer-inner {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 380px) {
+  .tier-grid {
+    grid-template-columns: 1fr;
+  }
+}
