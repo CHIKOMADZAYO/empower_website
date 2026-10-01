@@ -7,6 +7,7 @@ import './styles/index.css';
 import './styles/main.css';
 import './styles/dashboard.css';
 import './styles/dashboard-append.css';
+import './styles/public-refinement.css';
 
 // Import utilities and make available globally
 import * as API from './scripts/api.js';
