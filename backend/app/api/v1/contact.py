@@ -26,6 +26,7 @@ async def create_contact_message(
     database: Annotated[Session, Depends(get_db)],
 ) -> ContactMessageResponse:
     """Submit contact form message."""
+    # Record user activity for submitting a contact message
     await record_activity(
         database,
         user_id=User.id,
