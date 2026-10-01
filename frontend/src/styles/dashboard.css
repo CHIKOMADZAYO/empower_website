@@ -25,3 +25,107 @@
 .stat.accent h3,.stat.accent .sub{color:#d6e7db}
 .stat.accent .num{color:#fff}
 .dash-panels{display:grid;grid-template-columns:1.4fr .9fr;gap:1rem}
+
+/* Field journal styling for member and admin workspaces */
+.dash {
+  background: var(--paper);
+}
+.dash-side {
+  border-right: 4px solid var(--orange-500);
+  background: var(--green-950);
+}
+.dash-brand {
+  letter-spacing: 0;
+}
+.dash-nav button,
+.dash-nav a {
+  border-radius: var(--radius-sm);
+  letter-spacing: 0;
+}
+.dash-nav button:hover,
+.dash-nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+.dash-nav button.active {
+  border-left: 3px solid var(--orange-500);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+.dash-nav .ico {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius-sm);
+  background: transparent;
+}
+.dash-side-foot {
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.05);
+}
+.dash-top {
+  background: var(--paper);
+  backdrop-filter: none;
+  border-bottom-color: var(--line);
+}
+.dash-search,
+.dash-user {
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+.dash-avatar {
+  background: var(--green-800);
+}
+.stat {
+  border: 0;
+  border-top: 3px solid var(--green-700);
+  border-radius: 0;
+  background: #fff;
+  box-shadow: none;
+}
+.stat.accent {
+  border-top-color: var(--orange-500);
+  border-radius: 0;
+  background: var(--green-900);
+}
+.dash-panels {
+  gap: 1.25rem;
+}
+.panel {
+  border: 0;
+  border-top: 2px solid var(--green-800);
+  border-radius: 0;
+  box-shadow: none;
+}
+.panel-head {
+  background: #fff;
+}
+.table-wrap {
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+table.dtable th {
+  background: var(--cream);
+  color: var(--green-900);
+}
+.icon-btn {
+  border-radius: var(--radius-sm);
+}
+.form-card {
+  border: 0;
+  border-top: 2px solid var(--green-800);
+  border-radius: 0;
+  box-shadow: none;
+}
+.modal {
+  border-top: 4px solid var(--orange-500);
+  border-radius: 0;
+  box-shadow: var(--shadow-md);
+}
+.toast {
+  border-left: 3px solid var(--orange-500);
+  border-radius: 0;
+}
+.empty {
+  border-radius: 0;
+}
+.badge {
+  border-radius: var(--radius-sm);
+}

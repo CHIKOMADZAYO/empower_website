@@ -1,58 +1,59 @@
-/* Empower — Premium NGO design tokens */
-:root{
-  --green-950:#0a2e23;
-  --green-900:#0e3b2e;
-  --green-800:#134e3b;
-  --green-700:#147a55;
-  --green-600:#149065;
-  --green-100:#dcf0e5;
-  --green-50:#eef7f1;
+/* Empower design tokens */
+:root {
+  --green-950: #142b25;
+  --green-900: #203d34;
+  --green-800: #31584a;
+  --green-700: #39715c;
+  --green-600: #4d876e;
+  --green-100: #dce9e0;
+  --green-50: #edf3ee;
 
-  --amber-500:#f59e0b;
-  --amber-400:#fbbf24;
-  --amber-100:#fef3c7;
-  --orange-600:#ea580c;
-  --orange-500:#f97316;
-  --orange-100:#ffedd5;
+  --amber-500: #d49a2e;
+  --amber-400: #e5b84b;
+  --amber-100: #f4e7bf;
+  --orange-600: #a94330;
+  --orange-500: #c9533d;
+  --orange-100: #f4e0d9;
 
-  --ink:#10231b;
-  --ink-soft:#2f463c;
-  --muted:#5c7267;
-  --faint:#8aa095;
-  --paper:#fafaf7;
-  --cream:#fffaf0;
-  --card:#ffffff;
-  --line:#e6ece6;
-  --line-soft:#eef2ed;
+  --ink: #202824;
+  --ink-soft: #3e4943;
+  --muted: #68746d;
+  --faint: #87928b;
+  --paper: #f3f5f1;
+  --cream: #fbf7e9;
+  --card: #ffffff;
+  --line: #d9e0d9;
+  --line-soft: #e7ece7;
 
-  --primary:var(--green-800);
-  --accent:var(--orange-500);
-  --accent-dark:var(--orange-600);
-  --gold:var(--amber-400);
+  --primary: var(--green-800);
+  --accent: var(--orange-500);
+  --accent-dark: var(--orange-600);
+  --gold: var(--amber-400);
 
-  --font-sans:'Plus Jakarta Sans','Inter',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
-  --font-display:'Fraunces',Georgia,'Times New Roman',serif;
-  --font-primary:var(--font-sans);
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-primary: var(--font-sans);
 
-  --radius-sm:10px;
-  --radius:16px;
-  --radius-lg:22px;
-  --radius-xl:28px;
-  --radius-full:999px;
-  --border-radius:var(--radius);
-  --border-radius-lg:var(--radius-lg);
+  --radius-sm: 3px;
+  --radius: 5px;
+  --radius-lg: 7px;
+  --radius-xl: 8px;
+  --radius-full: 999px;
+  --border-radius: var(--radius);
+  --border-radius-lg: var(--radius-lg);
 
-  --shadow-xs:0 1px 2px rgba(16,35,27,.06);
-  --shadow-sm:0 2px 10px rgba(16,35,27,.07);
-  --shadow-md:0 12px 32px -12px rgba(16,35,27,.18);
-  --shadow-lg:0 24px 64px -16px rgba(16,35,27,.24);
-  --shadow-orange:0 12px 28px -8px rgba(249,115,22,.45);
-  --shadow-green:0 12px 32px -10px rgba(20,122,85,.4);
+  --shadow-xs: 0 1px 2px rgba(20, 43, 37, 0.05);
+  --shadow-sm: 0 2px 8px rgba(20, 43, 37, 0.06);
+  --shadow-md: 0 8px 24px rgba(20, 43, 37, 0.1);
+  --shadow-lg: 0 16px 40px rgba(20, 43, 37, 0.14);
+  --shadow-orange: 0 6px 16px rgba(169, 67, 48, 0.16);
+  --shadow-green: 0 6px 18px rgba(20, 43, 37, 0.16);
 
-  --spacing-xs:.25rem; --spacing-sm:.5rem; --spacing-md:1rem;
-  --spacing-lg:1.5rem; --spacing-xl:2rem;
-  --transition:all .25s cubic-bezier(.4,0,.2,1);
-  --container:1200px;
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --transition: all 0.2s ease;
+  --container: 1200px;
 }
-
-

@@ -2,7 +2,7 @@
  * Empower Frontend - Authentication Module
  */
 
-import { login, signup } from './api.js';
+import { getProfile, login, signup } from './api.js';
 
 /**
  * Set authentication token
@@ -30,6 +30,42 @@ export function clearToken() {
  */
 export function isAuthenticated() {
   return !!getToken();
+}
+
+export function logout() {
+  clearToken();
+  localStorage.removeItem('user');
+  window.location.href = '/login.html';
+}
+
+export async function requireRole(allowedRoles = [], redirectTo = '/login.html') {
+  if (!isAuthenticated()) {
+    window.location.href = redirectTo;
+    return null;
+  }
+
+  let user;
+  try {
+    const profile = await getProfile();
+    user = profile?.user ?? null;
+  } catch {
+    clearToken();
+    window.location.href = '/login.html';
+    return null;
+  }
+
+  if (!user) {
+    clearToken();
+    window.location.href = '/login.html';
+    return null;
+  }
+
+  if (allowedRoles.length && !allowedRoles.includes(user.role)) {
+    window.location.href = redirectTo;
+    return null;
+  }
+
+  return user;
 }
 
 /**
@@ -93,7 +129,7 @@ export async function handleLoginSubmit(event) {
 
     setToken(token);
     setFormStatus('[data-login-status]', 'Signed in successfully. Redirecting...');
-    window.location.href = 'projects.html';
+    window.location.href = '/dashboard.html';
   } catch (error) {
     setFormStatus('[data-login-status]', error.message || 'Unable to sign in. Please try again.', true);
   }
@@ -129,7 +165,7 @@ export async function handleSignupSubmit(event) {
 
     setToken(token);
     setFormStatus('[data-signup-status]', 'Account created successfully. Redirecting...');
-    window.location.href = 'projects.html';
+    window.location.href = '/dashboard.html';
   } catch (error) {
     setFormStatus('[data-signup-status]', error.message || 'Unable to create account. Please try again.', true);
   }
