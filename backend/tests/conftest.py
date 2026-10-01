@@ -17,7 +17,8 @@ from app.main import create_app
 
 @pytest.fixture(scope="function", autouse=True)
 def setup_test_db():
-    """Create test database and tables."""
+    """Reset the database to an empty state before each test."""
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     yield
     Base.metadata.drop_all(bind=engine)

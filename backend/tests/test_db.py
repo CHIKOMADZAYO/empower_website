@@ -34,13 +34,9 @@ def test_unknown_user_roles_are_rejected_by_database() -> None:
             )
 
 
-def test_seed_database_is_idempotent() -> None:
-    from app.main import seed_database
+def test_app_does_not_seed_mock_data_on_startup() -> None:
+    import app.main as app_main
 
-    seed_database()
+    assert not hasattr(app_main, "seed_database")
     with SessionLocal() as db:
-        users_first = db.query(User).count()
-        assert users_first >= 1
-    seed_database()
-    with SessionLocal() as db:
-        assert db.query(User).count() == users_first
+        assert db.query(User).count() == 0
