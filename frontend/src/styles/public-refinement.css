@@ -31,7 +31,7 @@ h1, h2, h3 { letter-spacing: 0; }
 .topbar-inner { padding-block: .42rem; }
 .topbar a { color: #fff; }
 
-header.site-header, header {
+header.site-header {
   background: var(--paper);
   border-color: var(--line);
   backdrop-filter: none;

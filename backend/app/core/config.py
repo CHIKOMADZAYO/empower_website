@@ -3,8 +3,8 @@
 import os
 from functools import lru_cache
 from pathlib import Path
-
 from dotenv import load_dotenv
+from sqlalchemy.engine import make_url
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
@@ -16,6 +16,19 @@ class Settings:
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL", f"sqlite:///{Path(__file__).resolve().parents[2] / 'empower.db'}"
     )
+
+    def __init__(self) -> None:
+        # SQLite's ./ paths are relative to the process working directory. Anchor
+        # them to the backend so API and migration commands always use one DB.
+        url = make_url(self.DATABASE_URL)
+        if url.get_backend_name() == "sqlite" and url.database:
+            database = Path(url.database)
+            if not database.is_absolute():
+                backend_dir = Path(__file__).resolve().parents[2]
+                absolute_database = (backend_dir / database).resolve()
+                self.DATABASE_URL = url.set(database=str(absolute_database)).render_as_string(
+                    hide_password=False
+                )
 
     # Security Settings
     SECRET_KEY: str = os.getenv("EMPOWER_SECRET_KEY", os.getenv("SECRET_KEY", ""))
