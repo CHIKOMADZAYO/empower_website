@@ -16,6 +16,7 @@ class Project(Base):
     category: Mapped[str] = mapped_column(String(100), nullable=False)
     summary: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
+    image_url: Mapped[str] = mapped_column(String(255), nullable=True)
 
     def __repr__(self) -> str:
-        return f"<Project(id={self.id}, name={self.name}, category={self.category})>"
+        return f"<Project(id={self.id}, name={self.name}, category={self.category}, image_url={self.image_url})>"
