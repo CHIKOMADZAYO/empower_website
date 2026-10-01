@@ -3,8 +3,8 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.security import create_access_token, hash_password, verify_password
 from app.core.roles import UserRole
+from app.core.security import create_access_token, hash_password, verify_password
 from app.models.user import User
 from app.schemas.auth import SignupRequest, TokenResponse
 

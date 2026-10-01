@@ -20,10 +20,14 @@ Create `.env` with production values:
 
 ```env
 DATABASE_URL=postgresql://user:password@host:5432/empower
-SECRET_KEY=your-secret-key-here
+SECRET_KEY=<output of: python -c "import secrets; print(secrets.token_urlsafe(48))">
 DEBUG=false
 ALLOWED_HOSTS=yourdomain.com
 ```
+
+The API refuses to start without a random JWT signing key of at least 32
+characters. Do not use demo credentials or enable `DEBUG` in production; demo
+users are seeded only when debug mode is enabled.
 
 ### Using Docker
 

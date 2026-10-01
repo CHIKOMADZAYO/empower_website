@@ -138,8 +138,8 @@ Production build (`build`) fails on any quality gate.
 
 ## Database
 
-Alembic lives in `backend/alembic` (`0001_initial` = users/projects/stories/
-contact, SQLite-safe). Destructive commands need confirmation unless
+The configured Alembic history lives in `backend/migrations/versions`
+(`backend/alembic.ini` points there). Destructive commands need confirmation unless
 `--force`. Never run `db reset` against production data.
 
 ## Docker

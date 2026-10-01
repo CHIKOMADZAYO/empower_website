@@ -1,7 +1,6 @@
 """FastAPI application factory."""
 
 import logging
-
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -9,8 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import v1_router
 from app.core.config import get_settings
-from app.middleware.request_logging import request_logging_middleware
 from app.core.database import init_db
+from app.middleware.request_logging import request_logging_middleware
 
 settings = get_settings()
 
@@ -95,7 +94,8 @@ async def lifespan(app: FastAPI):
     """Application lifespan context manager."""
     # Startup
     init_db()
-    seed_database()
+    if settings.DEBUG:
+        seed_database()
     yield
     # Shutdown (cleanup if needed)
 

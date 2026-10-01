@@ -3,6 +3,8 @@
 from fastapi.testclient import TestClient
 
 from app.core.database import SessionLocal
+from app.core.roles import UserRole
+from app.core.security import create_access_token, hash_password
 from app.models.log_activity import ActivityLog
 from app.models.user import User
 
@@ -15,7 +17,7 @@ def test_signup_creates_user_and_returns_token(client: TestClient) -> None:
 
     response = client.post(
         "/api/v1/auth/signup",
-        json={"username": username, "email": email, "password": password},
+        json={"username": username, "email": email, "password": password, "role": "admin"},
     )
 
     assert response.status_code == 201, response.text
@@ -32,6 +34,7 @@ def test_signup_creates_user_and_returns_token(client: TestClient) -> None:
 
     with SessionLocal() as database:
         user = database.query(User).filter(User.username == username).one()
+        assert user.role == UserRole.VIEWER
         actions = (
             database.query(ActivityLog.action)
             .filter(ActivityLog.user_id == user.id)
@@ -95,6 +98,34 @@ def test_login_with_incorrect_credentials_fails(client: TestClient) -> None:
         json={"username": "testuser", "password": "WrongPass123"},
     )
     assert response.status_code == 401
+
+
+def test_inactive_user_cannot_login_or_use_existing_token(client: TestClient) -> None:
+    """Deactivated accounts are rejected by both login and token authentication."""
+    with SessionLocal() as database:
+        user = User(
+            username="inactiveuser",
+            email="inactiveuser@example.com",
+            hashed_password=hash_password("StrongPass123"),
+            role=UserRole.VIEWER,
+            is_active=False,
+        )
+        database.add(user)
+        database.commit()
+        database.refresh(user)
+        token = create_access_token(user)
+
+    login_response = client.post(
+        "/api/v1/auth/login",
+        json={"username": "inactiveuser", "password": "StrongPass123"},
+    )
+    assert login_response.status_code == 401, login_response.text
+
+    profile_response = client.get(
+        "/api/v1/auth/profile",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert profile_response.status_code == 401, profile_response.text
 
     # Try login with non-existent user
     response = client.post(

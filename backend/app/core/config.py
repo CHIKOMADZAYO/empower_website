@@ -14,7 +14,7 @@ class Settings:
     )
 
     # Security Settings
-    SECRET_KEY: str = os.getenv("EMPOWER_SECRET_KEY", "development-only-change-me")
+    SECRET_KEY: str = os.getenv("EMPOWER_SECRET_KEY", os.getenv("SECRET_KEY", ""))
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
@@ -34,4 +34,11 @@ class Settings:
 @lru_cache
 def get_settings() -> Settings:
     """Get cached application settings."""
-    return Settings()
+    settings = Settings()
+    secret_key = settings.SECRET_KEY
+    if (
+        len(secret_key.encode("utf-8")) < 32
+        or any(marker in secret_key.lower() for marker in ("change-me", "development-only"))
+    ):
+        raise ValueError("Set EMPOWER_SECRET_KEY or SECRET_KEY to at least 32 random characters.")
+    return settings
