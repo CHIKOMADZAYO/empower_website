@@ -82,6 +82,9 @@ def run(args: argparse.Namespace, ctx: AppContext) -> int:
             db_service.upgrade(ctx)
         except Exception as exc:
             log.error("Migration step failed: %s", exc)
+            hint = getattr(exc, "hint", None)
+            if hint:
+                log.error("Migration details: %s", hint[-1500:])
             return 1
     if args.seed:
         try:

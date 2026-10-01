@@ -12,8 +12,13 @@ which makes them testable and keeps I/O at the edges (Clean Architecture).
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
+
+_ENV_REFERENCE = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
+_SECRET_VARIABLES = {"SECRET_KEY", "EMPOWER_SECRET_KEY"}
+_WEAK_SECRET_MARKERS = ("change-me", "development-only", "your-secret", "placeholder")
 
 
 def find_project_root(
@@ -98,4 +103,10 @@ def load_dotenv_if_present(env_file: Path) -> None:
             continue
         key, _, value = line.partition("=")
         key, value = key.strip(), value.strip().strip("'\"")
+        value = _ENV_REFERENCE.sub(lambda match: os.getenv(match.group(1), ""), value)
+        if key in _SECRET_VARIABLES and (
+            len(value.encode("utf-8")) < 32
+            or any(marker in value.lower() for marker in _WEAK_SECRET_MARKERS)
+        ):
+            continue
         os.environ.setdefault(key, value)
