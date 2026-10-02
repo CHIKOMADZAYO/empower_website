@@ -14,6 +14,9 @@ pytestmark = pytest.mark.integration
 
 
 def test_tables_exist_after_create_all() -> None:
+    from app.core.config import _backend_dir
+
+    assert engine.url.database != str((_backend_dir / "empower.db").resolve())
     Base.metadata.create_all(bind=engine)
     with SessionLocal() as db:
         assert db.query(User).all() == []
@@ -38,14 +41,13 @@ def test_sqlite_relative_path_is_resolved_to_backend_db(monkeypatch: pytest.Monk
     """Relative SQLite paths should always land on the same backend database file."""
     import app.core.config as config_module
 
-    monkeypatch.setenv("DATABASE_URL", "sqlite:///./backend/empower.db")
+    monkeypatch.setattr(config_module.Settings, "DATABASE_URL", "sqlite:///./backend/empower.db")
     config_module.get_settings.cache_clear()
     settings = config_module.get_settings()
 
     expected = (config_module.Path(__file__).resolve().parents[1] / "empower.db").resolve()
     assert config_module.Path(settings.DATABASE_URL.replace("sqlite:///", "")).resolve() == expected
 
-    monkeypatch.delenv("DATABASE_URL", raising=False)
     config_module.get_settings.cache_clear()
 
 

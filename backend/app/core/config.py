@@ -19,7 +19,8 @@ class Settings:
 
     # Database
     DATABASE_URL: str = os.getenv(
-        "DATABASE_URL", f"sqlite:///{_backend_dir / 'empower.db'}"
+        "EMPOWER_TEST_DATABASE_URL",
+        os.getenv("DATABASE_URL", f"sqlite:///{_backend_dir / 'empower.db'}"),
     )
 
     def __init__(self) -> None:

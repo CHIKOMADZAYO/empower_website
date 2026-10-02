@@ -2,11 +2,21 @@
 
 import os
 import sys
+import tempfile
 from pathlib import Path
 
 # Add backend directory to Python path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 os.environ.setdefault("EMPOWER_SECRET_KEY", "test-only-secret-key-with-at-least-32-bytes")
+
+# Never let destructive test fixtures connect to the developer's application DB.
+test_database_url = os.environ.get("EMPOWER_TEST_DATABASE_URL")
+if test_database_url:
+    os.environ["EMPOWER_TEST_DATABASE_URL"] = test_database_url
+else:
+    test_database = tempfile.NamedTemporaryFile(prefix="empower-test-", suffix=".db", delete=False)
+    test_database.close()
+    os.environ["EMPOWER_TEST_DATABASE_URL"] = f"sqlite:///{test_database.name}"
 
 import pytest
 from fastapi.testclient import TestClient

@@ -55,7 +55,7 @@ def run_pytest(
         args += ["--cov=app", "--cov-report=term-missing", "--cov-report=xml"]
     args += list(extra_args)
     # Isolate pytest runs from the developer's real DB: point SQLite at a
-    # throwaway file unless the caller explicitly set a test DATABASE_URL.
+    # throwaway file unless the caller explicitly set EMPOWER_TEST_DATABASE_URL.
     # (Prevents "database is locked" when the dev server owns empower.db.)
     test_env: dict[str, str] | None = None
     backend_url = ctx.settings.database_url or ""
@@ -63,10 +63,10 @@ def run_pytest(
         import os
         import tempfile
 
-        if not os.getenv("DATABASE_URL"):
+        if not os.getenv("EMPOWER_TEST_DATABASE_URL"):
             tmp = tempfile.NamedTemporaryFile(prefix="empower-test-", suffix=".db", delete=False)
             tmp.close()
-            test_env = {"DATABASE_URL": f"sqlite:///{tmp.name}"}
+            test_env = {"EMPOWER_TEST_DATABASE_URL": f"sqlite:///{tmp.name}"}
     _run_suite(ctx, cwd=backend, args=args, label=f"backend {scope} tests", env=test_env)
     if scope in ("all", "unit"):
         # Fast automation-CLI self tests; always part of unit/all runs.

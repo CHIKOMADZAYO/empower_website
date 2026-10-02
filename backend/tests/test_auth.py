@@ -100,9 +100,7 @@ def test_login_with_incorrect_credentials_fails(client: TestClient) -> None:
     assert response.status_code == 401
 
 
-def test_bootstrap_admin_creates_first_admin_once(
-    client: TestClient, monkeypatch
-) -> None:
+def test_bootstrap_admin_creates_first_admin_once(client: TestClient, monkeypatch) -> None:
     """Only a valid bootstrap token can create the first admin user."""
     monkeypatch.setenv("ADMIN_BOOTSTRAP_TOKEN", "bootstrap-secret-123456")
 
@@ -142,7 +140,9 @@ def test_unexpected_errors_are_sanitized(client: TestClient, monkeypatch) -> Non
     def boom(*args, **kwargs):
         raise RuntimeError("database password leak: secret-admin-pw")
 
-    monkeypatch.setattr("app.services.auth_service.AuthService.authenticate_user", staticmethod(boom))
+    monkeypatch.setattr(
+        "app.services.auth_service.AuthService.authenticate_user", staticmethod(boom)
+    )
 
     response = client.post(
         "/api/v1/auth/login",

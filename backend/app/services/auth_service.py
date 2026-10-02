@@ -65,7 +65,9 @@ class AuthService:
 
         try:
             database.execute(text("BEGIN IMMEDIATE"))
-            existing_admin = database.scalar(select(User).where(User.role == UserRole.ADMIN).limit(1))
+            existing_admin = database.scalar(
+                select(User).where(User.role == UserRole.ADMIN).limit(1)
+            )
             if existing_admin is not None:
                 raise ValueError("An admin account already exists.")
 
