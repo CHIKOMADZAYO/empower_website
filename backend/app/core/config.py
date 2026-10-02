@@ -6,7 +6,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 from sqlalchemy.engine import make_url
 
-load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+_backend_dir = Path(__file__).resolve().parents[2]
+_project_root = _backend_dir.parent
+
+for env_path in (_project_root / ".env", _backend_dir / ".env"):
+    if env_path.exists():
+        load_dotenv(env_path, override=env_path == _backend_dir / ".env")
 
 
 class Settings:
@@ -14,7 +19,7 @@ class Settings:
 
     # Database
     DATABASE_URL: str = os.getenv(
-        "DATABASE_URL", f"sqlite:///{Path(__file__).resolve().parents[2] / 'empower.db'}"
+        "DATABASE_URL", f"sqlite:///{_backend_dir / 'empower.db'}"
     )
 
     def __init__(self) -> None:
@@ -24,8 +29,7 @@ class Settings:
         if url.get_backend_name() == "sqlite" and url.database:
             database = Path(url.database)
             if not database.is_absolute():
-                backend_dir = Path(__file__).resolve().parents[2]
-                absolute_database = (backend_dir / database).resolve()
+                absolute_database = (_backend_dir / database).resolve()
                 self.DATABASE_URL = url.set(database=str(absolute_database)).render_as_string(
                     hide_password=False
                 )
@@ -39,6 +43,9 @@ class Settings:
     APP_NAME: str = "Empower API"
     APP_VERSION: str = "1.0.0"
     APP_DESCRIPTION: str = "API for Empower's community-led programs and support network."
+    ADMIN_BOOTSTRAP_TOKEN: str = os.getenv(
+        "ADMIN_BOOTSTRAP_TOKEN", os.getenv("FIRST_ADMIN_BOOTSTRAP_TOKEN", "")
+    )
     DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
 
     # CORS Settings

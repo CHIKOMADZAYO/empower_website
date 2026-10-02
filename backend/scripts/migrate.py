@@ -9,11 +9,19 @@ from pathlib import Path
 
 
 def migrate() -> None:
-    """Upgrade the database to head using the repo-root alembic.ini."""
+    """Upgrade the backend database to the latest Alembic revision."""
     root = Path(__file__).resolve().parents[2]
     backend = root / "backend"
     result = subprocess.run(
-        [sys.executable, "-m", "alembic", "-c", str(root / "alembic.ini"), "upgrade", "head"],
+        [
+            sys.executable,
+            "-m",
+            "alembic",
+            "-c",
+            str(backend / "alembic.ini"),
+            "upgrade",
+            "head",
+        ],
         cwd=backend,
     )
     if result.returncode != 0:

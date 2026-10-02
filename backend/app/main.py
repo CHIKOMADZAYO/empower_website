@@ -3,8 +3,10 @@
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.api import v1_router
 from app.core.config import get_settings
@@ -33,6 +35,17 @@ def create_app() -> FastAPI:
         version=settings.APP_VERSION,
         lifespan=lifespan,
     )
+
+    @app.exception_handler(Exception)
+    async def unhandled_exception_handler(_: Request, exc: Exception) -> JSONResponse:
+        """Hide internal details from clients while logging the real stack trace."""
+        logger.exception("Unhandled server error", exc_info=exc)
+        return JSONResponse(status_code=500, content={"detail": "Internal server error"})
+
+    @app.exception_handler(HTTPException)
+    async def http_exception_handler(_: Request, exc: HTTPException) -> JSONResponse:
+        """Preserve HTTP semantics without exposing internal details."""
+        return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
     # Add CORS middleware
     app.add_middleware(

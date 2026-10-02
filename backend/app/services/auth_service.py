@@ -1,12 +1,15 @@
 """Authentication service - business logic for auth operations."""
 
+import hmac
+import os
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.roles import UserRole
 from app.core.security import create_access_token, hash_password, verify_password
 from app.models.user import User
-from app.schemas.auth import SignupRequest, TokenResponse
+from app.schemas.auth import AdminBootstrapRequest, SignupRequest, TokenResponse
 
 
 class AuthService:
@@ -38,6 +41,40 @@ class AuthService:
             email=signup_request.email,
             hashed_password=hash_password(signup_request.password),
             role=UserRole.VIEWER,
+        )
+        database.add(user)
+        database.commit()
+        database.refresh(user)
+        return user
+
+    @staticmethod
+    def bootstrap_admin(database: Session, request: AdminBootstrapRequest) -> User:
+        """Create the first admin account exactly once when a valid bootstrap token is provided."""
+        bootstrap_token = os.getenv(
+            "ADMIN_BOOTSTRAP_TOKEN", os.getenv("FIRST_ADMIN_BOOTSTRAP_TOKEN", "")
+        )
+        if not bootstrap_token:
+            raise PermissionError("Admin bootstrap is disabled.")
+        if not hmac.compare_digest(request.bootstrap_token, bootstrap_token):
+            raise PermissionError("Invalid bootstrap token.")
+
+        existing_admin = database.scalar(select(User).where(User.role == UserRole.ADMIN).limit(1))
+        if existing_admin is not None:
+            raise ValueError("An admin account already exists.")
+
+        existing = database.scalar(
+            select(User).where(
+                (User.username == request.username) | (User.email == request.email)
+            )
+        )
+        if existing:
+            raise ValueError("Username or email already exists")
+
+        user = User(
+            username=request.username,
+            email=request.email,
+            hashed_password=hash_password(request.password),
+            role=UserRole.ADMIN,
         )
         database.add(user)
         database.commit()

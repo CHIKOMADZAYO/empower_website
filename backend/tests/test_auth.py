@@ -100,6 +100,60 @@ def test_login_with_incorrect_credentials_fails(client: TestClient) -> None:
     assert response.status_code == 401
 
 
+def test_bootstrap_admin_creates_first_admin_once(
+    client: TestClient, monkeypatch
+) -> None:
+    """Only a valid bootstrap token can create the first admin user."""
+    monkeypatch.setenv("ADMIN_BOOTSTRAP_TOKEN", "bootstrap-secret-123456")
+
+    response = client.post(
+        "/api/v1/auth/bootstrap-admin",
+        json={
+            "username": "bootstrapadmin",
+            "email": "bootstrapadmin@example.com",
+            "password": "StrongPass123",
+            "bootstrap_token": "bootstrap-secret-123456",
+        },
+    )
+
+    assert response.status_code == 201, response.text
+    payload = response.json()
+    assert "access_token" in payload
+
+    with SessionLocal() as database:
+        user = database.query(User).filter(User.username == "bootstrapadmin").one()
+        assert user.role == UserRole.ADMIN
+
+    second_response = client.post(
+        "/api/v1/auth/bootstrap-admin",
+        json={
+            "username": "anotheradmin",
+            "email": "anotheradmin@example.com",
+            "password": "StrongPass123",
+            "bootstrap_token": "bootstrap-secret-123456",
+        },
+    )
+    assert second_response.status_code == 409, second_response.text
+
+
+def test_unexpected_errors_are_sanitized(client: TestClient, monkeypatch) -> None:
+    """Unexpected exceptions should not leak internals to API clients."""
+
+    def boom(*args, **kwargs):
+        raise RuntimeError("database password leak: secret-admin-pw")
+
+    monkeypatch.setattr("app.services.auth_service.AuthService.authenticate_user", staticmethod(boom))
+
+    response = client.post(
+        "/api/v1/auth/login",
+        json={"username": "anyuser", "password": "StrongPass123"},
+    )
+
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Internal server error"}
+    assert "secret-admin-pw" not in response.text
+
+
 def test_inactive_user_cannot_login_or_use_existing_token(client: TestClient) -> None:
     """Deactivated accounts are rejected by both login and token authentication."""
     with SessionLocal() as database:

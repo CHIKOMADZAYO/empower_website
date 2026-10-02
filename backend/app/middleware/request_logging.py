@@ -2,6 +2,7 @@ import logging
 import time
 
 from fastapi import Request
+from fastapi.responses import JSONResponse
 
 logger = logging.getLogger(__name__)
 
@@ -35,4 +36,7 @@ async def request_logging_middleware(request: Request, call_next):
             duration,
         )
 
-        raise
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal server error"},
+        )

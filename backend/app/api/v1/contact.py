@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -15,7 +15,7 @@ from app.schemas.contact import (
     ContactMessageResponse,
 )
 from app.services.contact_service import ContactService
-from app.services.logs_service import record_activity
+from app.services.logs_service import record_activity_in_background
 
 router = APIRouter(prefix="/contact", tags=["contact"])
 
@@ -23,13 +23,14 @@ router = APIRouter(prefix="/contact", tags=["contact"])
 @router.post("", response_model=ContactMessageResponse, status_code=status.HTTP_201_CREATED)
 async def create_contact_message(
     request: Request,
+    background_tasks: BackgroundTasks,
     contact_data: ContactMessageCreate,
     database: Annotated[Session, Depends(get_db)],
 ) -> ContactMessageResponse:
     """Submit contact form message."""
     response = ContactService.create_message(database, contact_data)
-    record_activity(
-        database,
+    background_tasks.add_task(
+        record_activity_in_background,
         user_id=None,
         action="USER SENT A MESSAGE",
         resource="contact_message",
@@ -42,14 +43,15 @@ async def create_contact_message(
 @router.get("", response_model=list[ContactMessageListResponse])
 async def list_contact_messages(
     request: Request,
+    background_tasks: BackgroundTasks,
     database: Annotated[Session, Depends(get_db)],
     current_user: Annotated[User, Depends(require_roles(UserRole.ADMIN))],
 ) -> list[ContactMessageListResponse]:
     """Get all contact messages (admin only)."""
     messages = ContactService.get_all_messages(database)
 
-    record_activity(
-        database,
+    background_tasks.add_task(
+        record_activity_in_background,
         user_id=current_user.id,
         action="ADMIN LISTS ALL MESSAGE",
         resource="contact_message",
