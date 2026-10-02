@@ -34,6 +34,21 @@ def test_unknown_user_roles_are_rejected_by_database() -> None:
             )
 
 
+def test_sqlite_relative_path_is_resolved_to_backend_db(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Relative SQLite paths should always land on the same backend database file."""
+    import app.core.config as config_module
+
+    monkeypatch.setenv("DATABASE_URL", "sqlite:///./backend/empower.db")
+    config_module.get_settings.cache_clear()
+    settings = config_module.get_settings()
+
+    expected = (config_module.Path(__file__).resolve().parents[1] / "empower.db").resolve()
+    assert config_module.Path(settings.DATABASE_URL.replace("sqlite:///", "")).resolve() == expected
+
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    config_module.get_settings.cache_clear()
+
+
 def test_app_does_not_seed_mock_data_on_startup() -> None:
     import app.main as app_main
 

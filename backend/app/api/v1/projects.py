@@ -16,7 +16,7 @@ router = APIRouter(prefix="/projects", tags=["projects"])
 
 
 @router.get("", response_model=list[ProjectResponse])
-async def list_projects(
+def list_projects(
     database: Annotated[Session, Depends(get_db)],
 ) -> list[ProjectResponse]:
     """Get all projects."""
@@ -25,7 +25,7 @@ async def list_projects(
 
 
 @router.get("/{project_id}", response_model=ProjectResponse)
-async def get_project(
+def get_project(
     project_id: int,
     database: Annotated[Session, Depends(get_db)],
 ) -> ProjectResponse:
@@ -37,7 +37,7 @@ async def get_project(
 
 
 @router.post("", response_model=ProjectResponse, status_code=status.HTTP_201_CREATED)
-async def create_project(
+def create_project(
     project: ProjectCreate,
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles(UserRole.ADMIN, UserRole.EDITOR))],
@@ -48,7 +48,7 @@ async def create_project(
 
 
 @router.put("/{project_id}", response_model=ProjectResponse)
-async def update_project(
+def update_project(
     project_id: int,
     project: ProjectCreate,
     database: Annotated[Session, Depends(get_db)],
@@ -62,7 +62,7 @@ async def update_project(
 
 
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_project(
+def delete_project(
     project_id: int,
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles(UserRole.ADMIN, UserRole.EDITOR))],

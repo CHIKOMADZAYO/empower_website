@@ -45,7 +45,13 @@ def create_app() -> FastAPI:
     @app.exception_handler(HTTPException)
     async def http_exception_handler(_: Request, exc: HTTPException) -> JSONResponse:
         """Preserve HTTP semantics without exposing internal details."""
-        return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+        return JSONResponse(
+            status_code=exc.status_code,
+            content={"detail": exc.detail},
+            headers=exc.headers,
+        )
+
+    app.middleware("http")(request_logging_middleware)
 
     # Add CORS middleware
     app.add_middleware(
@@ -55,8 +61,6 @@ def create_app() -> FastAPI:
         allow_methods=settings.CORS_ALLOW_METHODS,
         allow_headers=settings.CORS_ALLOW_HEADERS,
     )
-
-    app.middleware("http")(request_logging_middleware)
 
     # Include routers
     app.include_router(v1_router)

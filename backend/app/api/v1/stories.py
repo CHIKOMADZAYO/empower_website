@@ -16,7 +16,7 @@ router = APIRouter(prefix="/stories", tags=["stories"])
 
 
 @router.get("", response_model=list[StoryResponse])
-async def list_stories(
+def list_stories(
     database: Annotated[Session, Depends(get_db)],
 ) -> list[StoryResponse]:
     """Get all community stories."""
@@ -25,7 +25,7 @@ async def list_stories(
 
 
 @router.get("/{story_id}", response_model=StoryResponse)
-async def get_story(
+def get_story(
     story_id: int,
     database: Annotated[Session, Depends(get_db)],
 ) -> StoryResponse:
@@ -39,7 +39,7 @@ async def get_story(
 
 
 @router.post("", response_model=StoryResponse, status_code=status.HTTP_201_CREATED)
-async def create_story(
+def create_story(
     story: StoryCreate,
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles(UserRole.ADMIN, UserRole.EDITOR))],
@@ -50,7 +50,7 @@ async def create_story(
 
 
 @router.delete("/{story_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_story(
+def delete_story(
     story_id: int,
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles(UserRole.ADMIN, UserRole.EDITOR))],
@@ -62,7 +62,7 @@ async def delete_story(
 
 
 @router.put("/{story_id}", response_model=StoryResponse)
-async def update_story(
+def update_story(
     story_id: int,
     story: StoryCreate,
     database: Annotated[Session, Depends(get_db)],

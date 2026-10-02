@@ -16,7 +16,7 @@ router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 
 @router.get("/admin", response_model=AdminSummaryResponse)
-async def admin_dashboard(
+def admin_dashboard(
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles(UserRole.ADMIN))],
 ) -> AdminSummaryResponse:
@@ -26,7 +26,7 @@ async def admin_dashboard(
 
 
 @router.get("/me", response_model=UserSummaryResponse)
-async def my_dashboard(
+def my_dashboard(
     database: Annotated[Session, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> UserSummaryResponse:

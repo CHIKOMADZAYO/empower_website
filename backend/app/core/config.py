@@ -23,13 +23,17 @@ class Settings:
     )
 
     def __init__(self) -> None:
-        # SQLite's ./ paths are relative to the process working directory. Anchor
-        # them to the backend so API and migration commands always use one DB.
+        # SQLite paths are relative to the process working directory, which varies by
+        # how the app is started. Always anchor them to the backend directory so a
+        # restart points at the same database file.
         url = make_url(self.DATABASE_URL)
         if url.get_backend_name() == "sqlite" and url.database:
             database = Path(url.database)
             if not database.is_absolute():
-                absolute_database = (_backend_dir / database).resolve()
+                if database.parts and database.parts[0] == "backend":
+                    absolute_database = (_backend_dir.parent / database).resolve()
+                else:
+                    absolute_database = (_backend_dir / database).resolve()
                 self.DATABASE_URL = url.set(database=str(absolute_database)).render_as_string(
                     hide_password=False
                 )

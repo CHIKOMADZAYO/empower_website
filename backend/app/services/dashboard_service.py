@@ -24,28 +24,22 @@ class DashboardService:
 
     @staticmethod
     def admin_summary(database: Session) -> dict:
-        total_users = database.scalar(select(func.count(User.id))) or 0
-        total_projects = database.scalar(select(func.count(Project.id))) or 0
-        total_stories = database.scalar(select(func.count(Story.id))) or 0
+        users_by_role_rows = database.execute(
+            select(User.role, func.count(User.id)).group_by(User.role)
+        )
+        projects_by_category_rows = database.execute(
+            select(Project.category, func.count(Project.id)).group_by(Project.category)
+        )
+        stories_by_category_rows = database.execute(
+            select(Story.category, func.count(Story.id)).group_by(Story.category)
+        )
+        users_by_role = _count_by_field(users_by_role_rows.all())
+        projects_by_category = _count_by_field(projects_by_category_rows.all())
+        stories_by_category = _count_by_field(stories_by_category_rows.all())
+        total_users = sum(users_by_role.values())
+        total_projects = sum(projects_by_category.values())
+        total_stories = sum(stories_by_category.values())
         total_messages = database.scalar(select(func.count(ContactMessage.id))) or 0
-
-        users_by_role = _count_by_field(
-            list(database.execute(select(User.role, func.count(User.id)).group_by(User.role)).all())
-        )
-        projects_by_category = _count_by_field(
-            list(
-                database.execute(
-                    select(Project.category, func.count(Project.id)).group_by(Project.category)
-                ).all()
-            )
-        )
-        stories_by_category = _count_by_field(
-            list(
-                database.execute(
-                    select(Story.category, func.count(Story.id)).group_by(Story.category)
-                ).all()
-            )
-        )
 
         recent_users = database.scalars(select(User).order_by(User.id.desc()).limit(5)).all()
         recent_projects = database.scalars(

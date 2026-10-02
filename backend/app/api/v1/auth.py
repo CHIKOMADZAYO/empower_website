@@ -16,7 +16,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/login", response_model=TokenResponse, status_code=status.HTTP_200_OK)
-async def login(
+def login(
     request: Request,
     background_tasks: BackgroundTasks,
     credentials: LoginRequest,
@@ -44,7 +44,7 @@ async def login(
 
 
 @router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-async def signup(
+def signup(
     required: Request,
     background_tasks: BackgroundTasks,
     request: SignupRequest,
@@ -74,7 +74,7 @@ async def signup(
 
 
 @router.post("/bootstrap-admin", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-async def bootstrap_admin(
+def bootstrap_admin(
     http_request: Request,
     background_tasks: BackgroundTasks,
     request: AdminBootstrapRequest,
@@ -107,7 +107,7 @@ async def bootstrap_admin(
 
 
 @router.get("/profile")
-async def get_profile(
+def get_profile(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> dict:
     """Get current user profile."""

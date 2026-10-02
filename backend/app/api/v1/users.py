@@ -16,7 +16,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("", response_model=list[UserListResponse])
-async def list_users(
+def list_users(
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles(UserRole.ADMIN))],
 ) -> list[UserListResponse]:

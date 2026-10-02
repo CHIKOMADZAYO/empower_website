@@ -3,7 +3,8 @@
 import hmac
 import os
 
-from sqlalchemy import select
+from sqlalchemy import select, text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.roles import UserRole
@@ -55,31 +56,44 @@ class AuthService:
         )
         if not bootstrap_token:
             raise PermissionError("Admin bootstrap is disabled.")
-        if not hmac.compare_digest(request.bootstrap_token, bootstrap_token):
+
+        if not hmac.compare_digest(
+            request.bootstrap_token.encode("utf-8"),
+            bootstrap_token.encode("utf-8"),
+        ):
             raise PermissionError("Invalid bootstrap token.")
 
-        existing_admin = database.scalar(select(User).where(User.role == UserRole.ADMIN).limit(1))
-        if existing_admin is not None:
-            raise ValueError("An admin account already exists.")
+        try:
+            database.execute(text("BEGIN IMMEDIATE"))
+            existing_admin = database.scalar(select(User).where(User.role == UserRole.ADMIN).limit(1))
+            if existing_admin is not None:
+                raise ValueError("An admin account already exists.")
 
-        existing = database.scalar(
-            select(User).where(
-                (User.username == request.username) | (User.email == request.email)
+            existing = database.scalar(
+                select(User).where(
+                    (User.username == request.username) | (User.email == request.email)
+                )
             )
-        )
-        if existing:
-            raise ValueError("Username or email already exists")
+            if existing:
+                raise ValueError("Username or email already exists")
 
-        user = User(
-            username=request.username,
-            email=request.email,
-            hashed_password=hash_password(request.password),
-            role=UserRole.ADMIN,
-        )
-        database.add(user)
-        database.commit()
-        database.refresh(user)
-        return user
+            user = User(
+                username=request.username,
+                email=request.email,
+                hashed_password=hash_password(request.password),
+                role=UserRole.ADMIN,
+            )
+            database.add(user)
+            database.flush()
+            database.commit()
+            database.refresh(user)
+            return user
+        except IntegrityError:
+            database.rollback()
+            raise ValueError("Username or email already exists") from None
+        except ValueError:
+            database.rollback()
+            raise
 
     @staticmethod
     def get_token_response(user: User) -> TokenResponse:

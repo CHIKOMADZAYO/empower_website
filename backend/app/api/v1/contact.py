@@ -21,7 +21,7 @@ router = APIRouter(prefix="/contact", tags=["contact"])
 
 
 @router.post("", response_model=ContactMessageResponse, status_code=status.HTTP_201_CREATED)
-async def create_contact_message(
+def create_contact_message(
     request: Request,
     background_tasks: BackgroundTasks,
     contact_data: ContactMessageCreate,
@@ -41,7 +41,7 @@ async def create_contact_message(
 
 
 @router.get("", response_model=list[ContactMessageListResponse])
-async def list_contact_messages(
+def list_contact_messages(
     request: Request,
     background_tasks: BackgroundTasks,
     database: Annotated[Session, Depends(get_db)],
@@ -62,7 +62,7 @@ async def list_contact_messages(
 
 
 @router.get("/{message_id}", response_model=ContactMessageListResponse)
-async def get_contact_message(
+def get_contact_message(
     message_id: int,
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles(UserRole.ADMIN))],
@@ -75,7 +75,7 @@ async def get_contact_message(
 
 
 @router.delete("/{message_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_contact_message(
+def delete_contact_message(
     message_id: int,
     database: Annotated[Session, Depends(get_db)],
     _: Annotated[User, Depends(require_roles(UserRole.ADMIN))],
